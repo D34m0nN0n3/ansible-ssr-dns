@@ -17,8 +17,8 @@ nav:
 
 plugins:
     - search
-    - git-revision-date
-        as_datetime: true
+    - git-revision-date-localized
+        timezone: Europe/Moscow
     - pdf-export:
         verbose: true
         media_type: print
