@@ -17,7 +17,7 @@ nav:
 
 plugins:
     - search
-    - git-revision-date-localized
+    - git-revision-date
     - pdf-export:
         verbose: true
         media_type: print
