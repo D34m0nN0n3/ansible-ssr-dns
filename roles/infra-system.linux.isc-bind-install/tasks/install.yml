@@ -1,0 +1,190 @@
+---
+- name: Insatllation ISC BIND on RHEL\CentOS 7 & 8
+  package:
+    name: "{{ bind_packages }}"
+    state: present
+  vars:
+    bind_packages:
+      - bind
+      - bind-chroot
+      - bind-libs
+      - bind-utils
+  when: ansible_os_family == 'RedHat' and (ansible_distribution_major_version == '7' or ansible_distribution_major_version >= '8')
+  tags:
+    - bind_setupe
+
+- name: Setup to rndc key
+  block:
+    - name: Generate rndc key
+      command: rndc-confgen -a -c "/etc/rndc.key"
+      args:
+        creates: "/etc/rndc.key"
+      when: inventory_hostname in groups['master'] or (bind_srv_role is defined and bind_srv_role == 'master')
+
+    - set_fact:
+        rndc_key_gen: "{{lookup('file', '/etc/rndc.key') }}"
+        cacheable: no
+
+    - name: Copy key to slaves nodes
+      copy:
+        content: "{{ rndc_key_gen }}"
+        dest: "/etc/rndc.key"
+      changed_when: false
+      when: (inventory_hostname in groups['slaves'] or (bind_srv_role is defined and bind_srv_role == 'slave')) and rndc_key_gen is defined
+  tags:
+    - bind_setupe
+
+- name: Change permission on rndc.key
+  file:
+    path: /etc/rndc.key
+    mode: u=rwx,g=rx
+    owner: root
+    group: named
+  tags:
+    - bind_setupe
+
+- name: Create dir for master zones files
+  file:
+    path: /var/named/masters
+    state: directory
+    mode: u=rwx,g=rx
+    owner: root
+    group: named
+  tags:
+    - bind_setupe
+
+- name: Allow named to modify files in /var/named
+  sefcontext:
+    target: '/var/named(/.*)?'
+    setype: named_zone_t
+    state: present
+  register: se_zones
+  tags:
+    - bind_setupe
+
+- name: Allow load configs
+  sefcontext:
+    target: '/etc/{{ item }}(/.*)?'
+    setype: named_conf_t
+    state: present
+  loop:
+      - named
+      - rndc
+  register: se_confs
+  tags:
+    - bind_setupe
+
+- name: Allow read zone files
+  sefcontext:
+    target: '/var/named/{{ item }}'
+    setype: named_cache_t
+    state: present
+  loop:
+    - data
+    - masters
+    - slaves
+  register: se_cached
+  tags:
+    - bind_setupe
+
+- name: Set allow BIND to write the master zone files
+  seboolean:
+    name: named_write_master_zones
+    state: yes
+    persistent: yes
+  tags:
+    - bind_setupe
+
+- name: Apply new SELinux file context to filesystem
+  command: restorecon -irv {{ item }}
+  loop:
+    - '/etc/rndc'
+    - '/etc/named'
+    - '/var/named'
+  when: se_confs.changed or se_zones.changed or se_cached.changed
+  tags:
+    - bind_setupe
+
+- name: Copy edit zone script
+  copy:
+    src: named-editzone.bash
+    dest: /usr/local/bin/named-editzone
+    owner: root
+    group: named
+    mode: "0750"
+  tags:
+    - bind_setupe
+
+- name: Create bind_exporter for prometheus
+  block:
+    - name: Insatllation node_exporter and bind_exporter
+      package:
+        name: "{{ bind_packages }}"
+        state: present
+      vars:
+        bind_packages:
+          - node_exporter
+          - bind_exporter
+  rescue:
+    - name: Ensure group {{ prometheus_user }} exists
+      group:
+        state: present
+        system: yes
+        name: "{{ prometheus_user }}"
+
+    - name: Create user {{ prometheus_user }}
+      user:
+        state: present
+        system: yes
+        name: "{{ prometheus_user }}"
+        group: "{{ prometheus_user }}"
+        shell: "/sbin/nologin"
+
+    - name: Unarchive a file that needs to be downloaded (node_exporter)
+      unarchive:
+        src: "{{ node_exporter_url }}"
+        dest: "/usr/local/bin"
+        remote_src: yes
+        owner: root
+        group: root
+        creates: "/usr/local/bin/node_exporter"
+        extra_opts:
+          - "--strip-components"
+          - "1"
+
+    - name: Unarchive a file that needs to be downloaded (bind_exporter)
+      unarchive:
+        src: "{{ bind_exporter_url }}"
+        dest: "/usr/local/bin"
+        remote_src: yes
+        owner: root
+        group: root
+        creates: "/usr/local/bin/bind_exporter"
+        extra_opts:
+          - "--strip-components"
+          - "1"
+
+    - name: Copy node_exporter & bind_exporter systemd service
+      copy:
+        src: "{{ item }}"
+        dest: "/etc/systemd/system/{{ item }}"
+        owner: root
+        group: root
+        mode: "0644"
+      loop:
+        - node_exporter.service
+        - bind_exporter.service
+
+    - name: Start and enable service node_exporter & bind_exporter
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+        daemon_reload: yes
+      loop:
+        - node_exporter.service
+        - bind_exporter.service
+  tags:
+    - bind_setupe
+    - bind_exporter_prometheus
+...

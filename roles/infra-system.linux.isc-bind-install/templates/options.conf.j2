@@ -1,0 +1,59 @@
+hostname                     "{{ ansible_fqdn }}";
+version                      "Unknown";
+server-id                    "Administrators contact: ph. {{ bind_cont_ph_num }}, e-mail {{ bind_cont_mail }}";
+listen-on port 53            { 127.0.0.1; {{ ansible_all_ipv4_addresses | join('; ') }}; };
+{% if bind_ip_v6_on is sameas true -%}
+listen-on-v6 port 53         { ::1; {{ ansible_all_ipv6_addresses | join('; ') }}; };
+{% else -%}
+listen-on-v6 port 53         { none; };
+{% endif -%}
+pid-file                     "/run/named/named.pid";
+session-keyfile              "/run/named/session.key";
+managed-keys-directory       "/var/named/dynamic";
+directory                    "/var/named";
+dump-file                    "/var/named/data/cache_dump.db";
+statistics-file              "/var/named/data/named_stats.txt";
+memstatistics-file           "/var/named/data/named_mem_stats.txt";
+memstatistics                yes;
+zone-statistics              yes;
+max-cache-size               {{ bind_max_cache | default('256M') }};
+max-journal-size             {{ bind_max_journal | default('500M') }};
+cleaning-interval            {{ bind_cleanig_interval | default('60') }};
+allow-query                  { authorized_networks; };
+allow-transfer               { none; };
+allow-update                 { none; };
+allow-query-on               { none; };
+allow-query-cache-on         { none; };
+query-source                 address {{ ansible_default_ipv4.address }} port *;
+{% if bind_ip_v6_on is sameas true -%}
+query-source-v6              address {{ ansible_default_ipv6.address }} port *;
+{% endif -%}
+transfer-source              {{ ansible_default_ipv4.address }} port 53;
+{% if alt_tranfer_src is defined and alt_tranfer_src is sameas true -%}
+{%  if alt_tranfer_addr is defined -%}
+alt-transfer-source          {{ alt_tranfer_addr }} port 53;
+{%  else -%}
+alt-transfer-source          {{ ansible_all_ipv4_addresses[1] }} port 53;
+{%  endif -%}
+{% endif -%}
+notify-source                * port 53;
+notify                       explicit;
+transfer-format              many-answers;
+minimal-responses            {{ bind_minimal_responses | default('yes') }};
+empty-zones-enable           yes;
+flush-zones-on-shutdown      yes;
+auth-nxdomain                no;    # conform to RFC1035
+{% if mf_format is defined -%}
+masterfile-format            {{ mf_format }};
+{% endif -%}
+{% if zero_ttl is defined or zero_ttl is sameas true -%}
+zero-no-soa-ttl              yes;
+zero-no-soa-ttl-cache        yes;
+{% endif -%}
+dnssec-enable                yes;
+dnssec-validation            auto;
+
+// Path to ISC DLV key
+bindkeys-file               "/etc/named.iscdlv.key";
+
+// END

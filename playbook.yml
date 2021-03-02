@@ -1,0 +1,12 @@
+---
+- hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: ISC bind install
+      include_role:
+        name: infra-system.linux.isc-bind-install
+
+    - name: Configure DNS client
+      include_role:
+        name: infra-system.linux.os.resolv

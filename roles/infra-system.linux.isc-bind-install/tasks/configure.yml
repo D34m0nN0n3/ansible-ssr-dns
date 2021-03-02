@@ -1,0 +1,205 @@
+---
+- name: Check contact info is defined
+  block:
+    - debug:
+        msg: Please indicate the contact phone number of the administrator in the variable 'bind_cont_ph_num'
+      when: bind_cont_ph_num is undefined 
+
+    - debug:
+        msg: Please indicate the contact e-mail of the administrator in the variable 'bind_cont_mail'
+      when: bind_cont_mail is undefined 
+
+    - debug:
+        msg: Please indicate the ACL for internal user in the variable 'bind_acl_int'
+      when: bind_acl_int is undefined 
+  always:
+    - meta: end_play
+  when: bind_cont_ph_num is undefined or bind_cont_mail is undefined or bind_acl_int is undefined 
+
+- name: Create dynamic groups for master and slaves
+  block:
+    - name: Dynamic group for master
+      group_by:
+        key: dynamic_group_master
+      when: (inventory_hostname in groups['master'] or (bind_srv_role is defined and bind_srv_role == 'master'))
+
+    - name: Dynamic group for slaves
+      group_by:
+        key: dynamic_group_slaves
+      when: (inventory_hostname in groups['slaves'] or (bind_srv_role is defined and bind_srv_role == 'slave'))
+
+- name: Create facts
+  block:
+    - name: Get all IPv4 for trust_servers ACL
+      set_fact:
+        trust_servers_dynamic: "{% for host in groups['all'] %}{{ hostvars[host].ansible_all_ipv4_addresses }}{% if not loop.last %},{% endif %}{% endfor %}"
+        cacheable: no
+
+    - name: Get all hostname for NS RR
+      set_fact:
+        hostname_fqdn_dynamic: "{% for host in groups['all'] %}{{ hostvars[host]['ansible_fqdn'] }}{% if not loop.last %},{% endif %}{% endfor %}"
+        cacheable: no
+
+    - name: Get master IP
+      set_fact:
+        ip_master: "{% for host in groups['dynamic_group_master'] %}{{ hostvars[host]['ansible_default_ipv4'].address }}{% if not loop.last %},{% endif %}{% endfor %}"
+
+    - name: Get slaves IP
+      set_fact:
+        ip_slaves: "{% for host in groups['dynamic_group_slaves'] %}{{ hostvars[host]['ansible_default_ipv4'].address }}{% if not loop.last %},{% endif %}{% endfor %}"
+
+- name: Check IPv6
+  block:
+    - name: Check if IPv6 disabled at grub command line
+      slurp:
+        src: /proc/cmdline
+      register: cmdline
+
+    - name: Check ip6 support
+      stat:
+        path: /proc/sys/net/ipv6
+      register: proc_ip6
+
+    - name: IPv6 is enabled on the node
+      set_fact:
+        bind_ip_v6_on: true
+        cacheable: no
+      register: ip_v6_on
+      when: proc_ip6.stat.exists or (ansible_system == 'Linux' and not "ipv6.disable=1" in cmdline.content|b64decode)
+
+    - name: IPv6 is disabled on the node
+      set_fact:
+        bind_ip_v6_on: false
+        cacheable: no
+      when: ip_v6_on.skipped
+  when: bind_ip_v6_on is undefined
+  tags:
+    - bind_configure
+    - bind_ip_v6_enable
+
+- name: Change config for run IPv4 only if IPv6 disabled
+  lineinfile:
+    path: /etc/sysconfig/named
+    line: 'OPTIONS="-4"'
+  when: bind_ip_v6_on | bool == false
+  tags:
+    - bind_configure
+    - bind_ip_v6_enable
+
+- name: Copy main config
+  template:
+    src: named.conf.j2
+    dest: /etc/named.conf
+    owner: root
+    group: named
+    mode: "0650"
+    setype: named_conf_t
+    backup: yes
+  tags:
+    - bind_configure
+    - bind_copy_configs
+
+- name: Copy ACL rules template file
+  template:
+    src: acl-list.conf.j2
+    dest: /etc/named/acl-list.conf
+    owner: root
+    group: named
+    mode: "0650"
+    setype: named_conf_t
+  tags:
+    - bind_configure
+    - bind_copy_configs
+
+- name: Copy options template file
+  template:
+    src: options.conf.j2
+    dest: /etc/named/options.conf
+    owner: root
+    group: named
+    mode: "0650"
+    setype: named_conf_t
+  tags:
+    - bind_configure
+    - bind_copy_configs
+
+- name: End after ACL change
+  block:
+    - name: Restart service
+      systemd:
+        name: named-chroot
+        state: restarted
+
+    - meta: end_host
+  when: bind_acl_change | bool == true
+
+- name: Copy logging rules template file
+  template:
+    src: logging.conf.j2
+    dest: /etc/named/logging.conf
+    owner: root
+    group: named
+    mode: "0650"
+    setype: named_conf_t
+  tags:
+    - bind_configure
+    - bind_copy_configs
+
+- name: Copy views template file
+  template:
+    src: views.conf.j2
+    dest: /etc/named/views.conf
+    owner: root
+    group: named
+    mode: "0650"
+    setype: named_conf_t
+  tags:
+    - bind_configure
+    - bind_copy_configs
+
+- name: Create RPZ zones
+  block:
+    - name: Copy RPZ zone policy
+      template:
+        src: 'rpz.{{ item }}.j2'
+        dest: '/var/named/rpz.{{ item }}'
+        owner: root
+        group: named
+        mode: "0650"
+        setype: named_cache_t
+      loop:
+        - passeddomain.hosts
+        - changeddomain.hosts
+        - blockeddomain.hosts
+  tags:
+    - bind_configure
+    - bind_copy_configs
+
+- name: Create empty zone config
+  block:
+    - name: Copy empty zone config
+      template:
+        src: '{{ item }}.j2'
+        dest: '/etc/named/{{ item }}'
+        owner: root
+        group: named
+        mode: "0650"
+        setype: named_conf_t
+      loop:
+        - zones-internal.conf
+        - zones-external.conf
+
+    - name: Copy empty zone files
+      template:
+        src: example.com.j2
+        dest: /var/named/masters/{{ empty_zone_name }}.db
+        owner: root
+        group: named
+        mode: "0640"
+        setype: named_cache_t
+      when: (inventory_hostname in groups['master'] or (bind_srv_role is defined and bind_srv_role == 'master'))
+  when: ((bind_srv_type is defined and bind_srv_type == 'mixed') or (bind_srv_type is defined and bind_srv_type == 'authorized')) and bind_restore_last_conf | bool == false
+  tags:
+    - bind_configure
+    - bind_create_zone
+...

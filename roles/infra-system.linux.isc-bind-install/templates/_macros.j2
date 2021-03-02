@@ -1,0 +1,3 @@
+{%- macro listify(parameter) -%}
+{{ parameter if parameter is string else parameter|join('; ') }}; 
+{%- endmacro -%}

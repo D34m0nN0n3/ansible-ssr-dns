@@ -1,0 +1,187 @@
+---
+- name: Copy backups config from git repo and create facts
+  block:
+    - local_action:
+        git repo="{{ remote_git_repo }}" dest="{{ local_git_repo }}" force=yes
+      run_once: true
+      tags:
+        - bind_restore_from_git
+
+    - set_fact:
+        named_zones: "{{lookup('file', '{{ local_git_repo }}/named.zones') }}"
+        cacheable: no
+      tags:
+        - bind_restore_from_git
+
+    - set_fact:
+        internal_include_extanded: "{{lookup('file', '{{ local_git_repo }}/internal-include-extanded.conf') }}"
+        cacheable: no
+      tags:
+        - bind_restore_from_git
+
+    - set_fact:
+        external_include_extanded: "{{lookup('file', '{{ local_git_repo }}/external-include-extanded.conf') }}"
+        cacheable: no
+      tags:
+        - bind_restore_from_git
+
+- name: Configure extands
+  block:
+    - name: Copy internal-include-extanded.conf & external-include-extanded.conf
+      copy:
+        src: "{{ local_git_repo }}/{{ item }}"
+        dest: "/etc/named/{{ item }}"
+        owner: root
+        group: named
+        mode: "0650"
+        setype: named_conf_t
+      loop:
+        - internal-include-extanded.conf
+        - external-include-extanded.conf
+
+    - name: Replace type zone master to slave in external-include-extanded.conf
+      replace:
+        path: "/etc/named/external-include-extanded.conf"
+        regexp: 'type(\s*)master\;'
+        replace: 'type slave;\n\t\t masters { {{ ip_master }}; };'
+        owner: root
+        group: named
+        mode: "0640"
+        setype: named_cache_t
+      when: (inventory_hostname in groups['slaves'] or (bind_srv_role is defined and bind_srv_role == 'slave'))
+
+    - name: Replace dir in external-include-extanded.conf
+      replace:
+        path: "/etc/named/external-include-extanded.conf"
+        regexp: '(/var/named/masters/|/var/named/slaves/)'
+        replace: '/var/named/slaves/external/'
+        owner: root
+        group: named
+        mode: "0640"
+        setype: named_cache_t
+      when: (inventory_hostname in groups['slaves'] or (bind_srv_role is defined and bind_srv_role == 'slave'))
+
+    - name: Add include to internal view
+      lineinfile:
+        path: "/etc/named/views.conf"
+        insertbefore: 'include                       "/etc/named/zones-internal.conf";'
+        line: 'include                       "/etc/named/internal-include-extanded.conf";'
+        state: present
+
+    - name: Add include to external view
+      lineinfile:
+        path: "/etc/named/views.conf"
+        insertbefore: 'include                       "/etc/named/zones-external.conf";'
+        line: 'include                       "/etc/named/external-include-extanded.conf";'
+        state: present
+
+- name: Create temp zones config
+  local_action:
+    copy content="{{ named_zones }}" dest="{{ local_git_repo }}/{{ item }}" owner=root group=named mode="0640" setype=named_conf_t
+  loop:
+    - zones-internal.conf
+    - zones-external.conf
+  run_once: true
+  tags:
+    - bind_restore_from_git
+
+- name: Replace type zone master to slave
+  local_action:
+    replace path="{{ local_git_repo }}/zones-external.conf" regexp='type(\s*)master\;' replace='type slave;\n\t\t masters { {{ ip_master }}; };' owner=root group=named mode="0640" setype=named_cache_t
+  run_once: true
+  tags:
+  - bind_restore_from_git
+
+- name: Replace dir in internal view
+  local_action:
+    replace path="{{ local_git_repo }}/zones-internal.conf" regexp='/var/named/slaves/' replace='/var/named/slaves/internal/' owner=root group=named mode="0640" setype=named_cache_t
+  run_once: true
+  tags:
+    - bind_restore_from_git
+
+- name: Replace dir in external view
+  local_action:
+    replace path="{{ local_git_repo }}/zones-external.conf" regexp='(/var/named/masters/|/var/named/slaves/)' replace='/var/named/slaves/external/' owner=root group=named mode="0640" setype=named_cache_t
+  run_once: true
+  tags:
+    - bind_restore_from_git
+
+- name: Purge attributes
+  lineinfile:
+    path: "{{ local_git_repo }}/zones-external.conf"
+    regexp: '^\s*notify\syes\;$'
+    state: absent
+  tags:
+    - bind_restore_from_git
+
+- name: Create dir for master zones files
+  file:
+    path: "/var/named/slaves/{{ item }}"
+    state: directory
+    mode: u=rwx,g=rx
+    owner: named
+    group: named
+    setype: named_cache_t
+  loop:
+    - internal
+    - external
+  tags:
+    - bind_restore_from_git
+
+- name: Copy zones config on master
+  copy:
+    src: "{{ local_git_repo }}/{{ item }}"
+    dest: "/etc/named/{{ item }}"
+    owner: root
+    group: named
+    mode: "0650"
+    setype: named_conf_t
+  loop:
+    - zones-internal.conf
+    - zones-external.conf
+  when: (inventory_hostname in groups['master'] or (bind_srv_role is defined and bind_srv_role == 'master'))
+  tags:
+    - bind_restore_from_git
+
+- name: Copy zones config on slave
+  copy:
+    src: "{{ local_git_repo }}/zones-external.conf"
+    dest: "/etc/named/{{ item }}"
+    owner: root
+    group: named
+    mode: "0650"
+    setype: named_conf_t
+  loop:
+    - zones-internal.conf
+    - zones-external.conf
+  when: (inventory_hostname in groups['slaves'] or (bind_srv_role is defined and bind_srv_role == 'slave'))
+  tags:
+    - bind_restore_from_git
+
+- name: Replace dir in internal view for slaves
+  replace:
+    path: "/etc/named/zones-internal.conf"
+    regexp: '/var/named/slaves/external/'
+    replace: '/var/named/slaves/internal/'
+    owner: root
+    group: named
+    mode: "0640"
+    setype: named_cache_t
+  when: (inventory_hostname in groups['slaves'] or (bind_srv_role is defined and bind_srv_role == 'slave'))
+  tags:
+    - bind_restore_from_git
+
+- name: Copy zones files on master
+  copy:
+    src: "{{ item }}"
+    dest: "/var/named/masters/"
+    owner: root
+    group: named
+    mode: "0640"
+    setype: named_cache_t
+  with_fileglob:
+    - "{{ local_git_repo }}/masters/*"
+  when: (inventory_hostname in groups['master'] or (bind_srv_role is defined and bind_srv_role == 'master'))
+  tags:
+    - bind_restore_from_git
+...

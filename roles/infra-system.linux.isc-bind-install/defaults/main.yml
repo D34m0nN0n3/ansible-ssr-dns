@@ -1,0 +1,18 @@
+---
+# User name for bind_exporter
+prometheus_user: 'prometheus'
+
+# ACL options match-clients and allow-query view "external"
+bind_acl_ext: ['any']
+
+# Type server role
+bind_srv_type: 'resolver'
+
+# Name empty zone
+empty_zone_name: 'example.com'
+
+# For restore last configuration from git
+bind_restore_last_conf: True
+
+# Git clone dir
+local_git_repo: '/var/tmp/isc-bind-files'

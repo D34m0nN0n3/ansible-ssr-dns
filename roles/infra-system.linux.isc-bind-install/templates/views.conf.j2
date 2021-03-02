@@ -1,0 +1,136 @@
+{%- import '_macros.j2' as macros with context -%}
+{% set list_slaves = ip_slaves.split(',') %}
+// Change the version that BIND reports when queried for version.bind: https://kb.isc.org/docs/aa-00359
+// How share a dynamic zone between multiple views: https://kb.isc.org/docs/aa-00295
+// Response Policy Zones (RPZ): https://kb.isc.org/docs/aa-00525
+//
+{% if bind_srv_type == "resolver" | string() or bind_srv_type == "mixed" | string() %}
+view "internal" {
+      match-clients { internal; };
+      allow-query { internal; };
+      allow-query-on { internal; };
+      allow-query-cache-on { internal; };
+      allow-update { trusted_servers; };
+      allow-notify { trusted_servers; };
+      allow-transfer { trusted_servers; };
+      allow-recursion { internal; };
+      recursion yes;
+      additional-from-auth yes;
+      additional-from-cache yes;
+{%  if bind_forwarders is defined %}
+      forward first;
+      {%   if bind_forwarders | length > 0 %}forwarders { {{ bind_forwarders | join('; ') }}; };{%   endif %}
+{%  endif %}
+
+      dnssec-enable no;
+      dnssec-validation no;
+
+      rate-limit {
+           responses-per-second 10;
+           referrals-per-second 5;
+           nodata-per-second 5;
+           errors-per-second 5;
+           all-per-second 20;
+           min-table-size 500;
+           max-table-size 20000;
+           slip 2;
+           window 15;
+           qps-scale 250;
+           log-only yes; 
+           };
+
+      response-policy { zone "rpz.passeddomain.hosts" policy passthru; 
+                        zone "rpz.changeddomain.hosts" policy given;
+                        zone "rpz.blockeddomain.hosts" policy nxdomain;
+                        };
+
+zone "rpz.passeddomain.hosts" IN {
+{%   if ansible_fqdn in groups['dynamic_group_master'] %}
+      type master;
+{%   else %}
+      type slave;
+{%   endif %}
+      file "/var/named/rpz.passeddomain.hosts";
+{%   if ansible_fqdn in groups['dynamic_group_master'] %}
+      allow-transfer { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
+      also-notify { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
+      allow-update { none; };
+      notify yes;
+{%   else %}
+      masters { {{ ip_master }}; };
+      allow-transfer { none; };
+{%   endif %}
+      };
+
+zone "rpz.changeddomain.hosts" IN {
+{%   if ansible_fqdn in groups['dynamic_group_master'] %}
+      type master;
+{%   else %}
+      type slave;
+{%   endif %}
+      file "/var/named/rpz.changeddomain.hosts";
+{%   if ansible_fqdn in groups['dynamic_group_master'] %}
+      allow-transfer { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
+      also-notify { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
+      allow-update { none; };
+      notify yes;
+{%   else %}
+      masters { {{ ip_master }}; };
+      allow-transfer { none; };
+{%   endif %}
+      };
+
+zone "rpz.blockeddomain.hosts" IN {
+{%   if ansible_fqdn in groups['dynamic_group_master'] %}
+      type master;
+{%   else %}
+      type slave;
+{%   endif %}
+      file "/var/named/rpz.blockeddomain.hosts";
+{%   if ansible_fqdn in groups['dynamic_group_master'] %}
+      allow-transfer { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
+      also-notify { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
+      allow-update { none; };
+      notify yes;
+{%   else %}
+      masters { {{ ip_master }}; };
+      allow-transfer { none; };
+{%   endif %}
+      };
+        
+zone "." IN {
+      type hint;
+      file "named.ca";
+      };
+
+include                       "/etc/named.rfc1912.zones";
+{%  if bind_srv_type == "mixed" | string() %}
+include                       "/etc/named/zones-internal.conf";
+{%  endif %}
+};
+{% endif %}
+
+{% if bind_srv_type == "authorized" | string() or bind_srv_type == "mixed" | string() %}
+view "external" {
+      match-clients { external; };
+      allow-query { external; };
+      allow-query-on { external; };
+      allow-query-cache-on { none; };
+      allow-update { trusted_servers; };
+      allow-notify { trusted_servers; };
+      allow-transfer { trusted_servers; };
+      recursion no;
+      additional-from-auth no;
+      additional-from-cache no;
+{%  if alt_tranfer_src is defined and alt_tranfer_src is sameas true %}
+      use-alt-transfer-source yes;
+{%  endif %}
+
+      dnssec-enable yes;
+      dnssec-validation yes;
+
+include                       "/etc/named/zones-external.conf";
+};
+{% endif %}
+
+//END

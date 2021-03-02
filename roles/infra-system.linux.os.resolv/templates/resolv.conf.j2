@@ -1,0 +1,10 @@
+{{ ansible_managed | comment }}
+options rotate
+options attempts: {{ dns_attempts }}
+options timeout: {{ dns_timeout }}
+options ndots: {{ dns_ndots }}
+domain {{ dns_domain }}
+search {{ dns_search | join(' ') }}
+{% for ns in nameserver %}
+nameserver {{ ns }}
+{% endfor %}

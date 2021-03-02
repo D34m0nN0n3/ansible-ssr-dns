@@ -1,0 +1,62 @@
+{%- import '_macros.j2' as macros with context -%}
+acl "authorized_networks" { localhost; localnets; {% if auth_nets is defined %}{{ auth_nets | join('; ') }}; {% else %}any; {% endif %}};
+
+acl "trusted_clients" { localhost; {% if trust_clients is defined %}{{ trust_clients | join('; ') }}; {% endif %}};
+
+acl "trusted_servers" { localhost; {% if trust_servers is defined %}{{ trust_servers | join('; ') }}; {% endif %}{%  for acl_ts in trust_servers_dynamic %}{%   if acl_ts is string or acl_ts is iterable %}{{ macros.listify(acl_ts) }} {%   elif acl_ts is mapping %}{{ macros.listify(acl_ts) }} {%   endif %}{%  endfor %}};
+{% if bind_srv_type == "resolver" | string() or bind_srv_type == "mixed" | string() %}
+{%  if bind_acl_int_exclude is defined %}
+
+acl internal-exclude {
+{% for acl_int_ex in bind_acl_int_exclude %}
+{%   if acl_int_ex is string or acl_int_ex is iterable %}
+        {{ macros.listify(acl_int_ex) }}
+{%   elif acl_int is mapping %}
+        {{ macros.listify(acl_int_ex) }}
+{%   endif %}
+{% endfor %}
+        };
+{%  endif %}
+
+acl internal {
+{%    if bind_acl_int_exclude is defined %}
+        !internal-exclude;
+{%    endif %}
+{% for acl_int in bind_acl_int %}
+{%   if acl_int is string or acl_int is iterable %}
+        {{ macros.listify(acl_int) }}
+{%   elif acl_int is mapping %}
+        {{ macros.listify(acl_int) }}
+{%   endif %}
+{% endfor %}
+        };
+{% endif %}
+{% if bind_srv_type == "authorized" | string() or bind_srv_type == "mixed" | string() %}
+{%  if bind_acl_ext_exclude is defined %}
+
+acl external-exclude {
+{% for acl_ext_ex in bind_acl_ext_exclude %}
+{%   if acl_ext_ex is string or acl_ext_ex is iterable %}
+        {{ macros.listify(acl_ext_ex) }}
+{%   elif acl_int is mapping %}
+        {{ macros.listify(acl_ext_ex) }}
+{%   endif %}
+{% endfor %}
+        };
+{%  endif %}
+
+acl external {
+{%    if bind_acl_ext_exclude is defined %}
+        !external-exclude;
+{%    endif %}
+{% for acl_ext in bind_acl_ext %}
+{%   if acl_ext is string or acl_ext is iterable %}
+        {{ macros.listify(acl_ext) }}
+{%   elif acl_int is mapping %}
+        {{ macros.listify(acl_ext) }}
+{%   endif %}
+{% endfor %}
+        };
+{% endif %}
+
+// END

@@ -1,0 +1,45 @@
+---
+- name: Check configuration
+  block:
+    - name: Check named.conf
+      command: named-checkconf /etc/named.conf
+      register: check_conf_result
+
+    - name: Check zones
+      command: named-checkconf -z
+      register: check_zones_result
+
+- name: Check services exists
+  block:
+    - name: Check service facts
+      service_facts:
+
+    - name: Enable service ISC BIND and ensure it is not masked
+      systemd:
+        name: named-chroot
+        state: started
+        enabled: yes
+        masked: no
+      register: result
+      when: ansible_facts.services['named-chroot.service'] is defined and ansible_facts.services['named-chroot.service'].status == 'disabled'
+  when: (check_conf_result.rc == 0) and (check_zones_result.rc == 0)
+
+- name: Mail report
+  block:
+    - name: RCPT
+      set_fact: 
+        mail_rcpt_to: bind_cont_mail
+      when: mail_rcpt_to is undefined
+
+    - name: Send mail report
+      mail:
+        host: "{{ mail_host }}"
+        port: "{{ mail_port | default('25') }}"
+        to: "{{ mail_rcpt_to }}"
+        subject: 'ISC BIND install.'
+        body: "{{ lookup('template', 'templates/mail_body.j2') }}"
+      delegate_to: localhost
+      ignore_errors: yes
+      run_once: True
+  when: mail_host is defined
+...

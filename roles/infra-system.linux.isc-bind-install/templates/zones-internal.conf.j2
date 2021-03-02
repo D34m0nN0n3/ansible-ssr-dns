@@ -1,0 +1,32 @@
+{% set list_slaves = ip_slaves.split(',') %}
+// named.rzd.zones:
+//
+// Provided by Red Hat caching-nameserver package 
+//
+// ISC BIND named zone configuration for zones recommended by
+// RFC 1912 section 4.1 : localhost TLDs and address zones
+// and http://www.ietf.org/internet-drafts/draft-ietf-dnsop-default-local-zones-02.txt
+// (c)2007 R W Franks
+// 
+// See /usr/share/doc/bind*/sample/ for example named configuration files.
+//
+
+zone "{{ empty_zone_name }}" in {
+{% if ansible_fqdn in groups['dynamic_group_master'] %}
+      type master;
+      file "/var/named/masters/{{ empty_zone_name }}.db";
+{% else %}
+      type slave;
+      file "/var/named/slaves/int-{{ empty_zone_name }}.db";
+{% endif %}
+{% if ansible_fqdn in groups['dynamic_group_master'] %}
+      allow-transfer { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
+      also-notify { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
+      allow-update { none; };
+      notify yes;
+{% else %}
+      masters { {{ ip_master }}; };
+{% endif %}
+};
+
+//END

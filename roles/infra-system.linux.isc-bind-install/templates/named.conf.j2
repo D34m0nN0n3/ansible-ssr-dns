@@ -1,0 +1,36 @@
+// named.conf
+//
+// Provided by Red Hat bind package to configure the ISC BIND named(8) DNS
+// server as a caching only nameserver (as a localhost DNS resolver only).
+//
+// See /usr/share/doc/bind*/sample/ for example named configuration files.
+//
+// See the BIND Administrator's Reference Manual (ARM) for details about the
+// configuration located in /usr/share/doc/bind-{version}/Bv9ARM.html
+
+// 
+include "/etc/named/acl-list.conf";
+
+options  {
+        include "/etc/named/options.conf";
+};
+
+logging {
+        include "/etc/named/logging.conf";
+};
+
+    include                       "/etc/rndc.key";
+    include                       "/etc/named.root.key";
+
+controls {
+        inet 127.0.0.1 port 953 allow { trusted_servers; } keys { "rndc-key"; };
+};
+
+statistics-channels {
+        inet 127.0.0.1 port 8053 allow { 127.0.0.1; };
+};
+
+// Public view read by Server Admin
+include "/etc/named/views.conf";
+
+// END
