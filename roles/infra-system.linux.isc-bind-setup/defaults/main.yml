@@ -12,7 +12,7 @@ bind_srv_type: 'resolver'
 empty_zone_name: 'example.com'
 
 # For restore last configuration from git
-bind_restore_last_conf: True
+bind_restore_last_conf: False
 
 # Git clone dir
 local_git_repo: '/var/tmp/isc-bind-files'

@@ -35,6 +35,8 @@ DNS-клиент — программа (или модуль в программ
     nameserver=['1.1.1.1','1.0.0.1','8.8.8.8','8.8.4.4']
     ```
 
+![Example](../images/resolv.gif)
+
 ## Дополнительные материалы
 - [Linux manual page - resolv.conf(5)](https://man7.org/linux/man-pages/man5/resolv.conf.5.html)
 - [DNS configuration with Ansible](https://www.redhat.com/sysadmin/dns-configuration-ansible)

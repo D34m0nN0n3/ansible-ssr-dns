@@ -32,35 +32,41 @@ Domain name server — приложение, предназначенное дл
 !!! tip
     Поддерживается загрузка предыдущей конфигурации из `git` репозитория.
 
+!!! note
+    Роль поддерживает статические и динамические `inventory`.
+
+!!! note
+    Для редактирования файлов зон есть скрипт `/usr/local/bin/named-editzone`, который обновляет номер зоны при сохранение, проверяет синтаксис, перечитывает конфигурацию. Перед внесением изменений делает временный файл зоны.
+
 ## Параметры
-|Название переменной               | Тип переменной | Значения по умолчанию                | Описание                                                    |
-|:---------------------------------|:--------------:|:------------------------------------:|:------------------------------------------------------------|
-|prometheus_user                   | string         | def in var (prometheus)              | |
-|node_exporter_url                 | string         | undef                                | |
-|bind_exporter_url                 | string         | undef                                | |
-|bind_forwarders                   | array          | undef                                | |
-|bind_acl_int                      | array          | undef                                | |
-|bind_acl_int_exclude              | array          | undef                                | |
-|bind_acl_ext                      | array          | def in var (any)                     | |
-|bind_acl_ext_exclude              | array          | undef                                | |
-|bind_acl_change                   | boolean        | undef (false)                        | |
-|bind_cont_ph_num                  | string         | undef                                | |
-|bind_cont_mail                    | string         | undef                                | |
-|bind_srv_role                     | string         | undef                                | |
-|bind_srv_type                     | string         | def in var (resolver)                | |
-|bind_ip_v6_on                     | boolean        | undef (false  )                      | |
-|bind_max_cache                    | string         | 256M                                 | |
-|bind_max_journal                  | string         | 500M                                 | |
-|bind_cleanig_interval             | string         | 60                                   | |
-|alt_tranfer_src                   | boolean        | undef (false)                        | |
-|mf_format                         | string         | undef                                | |
-|zero_ttl                          | boolean        | undef                                | |
-|trust_clients                     | array          | localhost                            | |
-|trust_servers                     | array          | {{ ansible_all_ipv4_addresses }}     | |
-|empty_zone_name                   | string         | def in var (example.com)             | |
-|bind_restore_last_conf            | boolean        | def in var (false)                   | |
-|remote_git_repo                   | string         | undef                                | |
-|local_git_repo                    | string         | def in var (/var/tmp/isc-bind-files) | |
+|Название переменной               | Тип переменной | Значения по умолчанию                | Описание                                                                                  |
+|:---------------------------------|:--------------:|:------------------------------------:|:------------------------------------------------------------------------------------------|
+|prometheus_user                   | string         | def in var (prometheus)              | Пользователь для exporter'ов.                                                             |
+|node_exporter_url                 | string         | undef                                | URL на пакет с nede_exporter.                                                             |
+|bind_exporter_url                 | string         | undef                                | URL на пакет с bind_exporter.                                                             |
+|bind_forwarders                   | array          | undef                                | Список серверов куда пересылать запросы которые нельзя разрешить.                         |
+|bind_acl_int                      | array          | undef                                | Список контроля кому можно разрешать рекурсивные запросы.                                 |
+|bind_acl_int_exclude              | array          | undef                                | Список исключений кому можно разрешать рекурсивные запросы.                               |
+|bind_acl_ext                      | array          | def in var (any)                     | Список контроля кому можно разрешать записи из зон.                                       |
+|bind_acl_ext_exclude              | array          | undef                                | Список исключений кому можно разрешать записи из зон.                                     |
+|bind_acl_change                   | boolean        | undef (false)                        | Для формирования новых списков контроля.                                                  |
+|bind_cont_ph_num                  | string         | undef                                | Контактный номер телефона администратора.                                                 |
+|bind_cont_mail                    | string         | undef                                | Контактный почтовый адрес администратора.                                                 |
+|bind_srv_role                     | string         | undef                                | Роль сервера: `master` или `slave`.                                                       |
+|bind_srv_type                     | string         | def in var (resolver)                | Тип сервера: `resolver` - кэширующий, `authorized` - авторитативный, `mixed` - смешанный. |
+|bind_ip_v6_on                     | boolean        | undef (false  )                      | Поддержка протокола IPv6.                                                                 |
+|bind_max_cache                    | string         | 256M                                 | Максимальный размер кеша в Мб.                                                            |
+|bind_max_journal                  | string         | 500M                                 | Максимальный размер журнала в Мб.                                                         |
+|bind_cleanig_interval             | string         | 60                                   | Задающая интервал очищения кэша RR записей в минутах.                                     |
+|alt_tranfer_src                   | boolean        | undef (false)                        | Задает использования альтернативного интерфейса для передачи зон.                         |
+|mf_format                         | string         | undef                                | Задает формат зон: map, raw, text.                                                        |
+|zero_ttl                          | boolean        | undef                                | При возврате авторитетных отрицательных ответов на запросы SOA установите TTL записи SOA. |
+|trust_clients                     | array          | localhost                            | Задает список клиентов по умолчанию.                                                      |
+|trust_servers                     | array          | {{ ansible_all_ipv4_addresses }}     | Задает список серверов по умолчанию.                                                      |
+|empty_zone_name                   | string         | def in var (example.com)             | Задает имя первой зоны.                                                                   |
+|bind_restore_last_conf            | boolean        | def in var (false)                   | Задает нужно ли восстановить предыдущую конфигурацию.                                     |
+|remote_git_repo                   | string         | undef                                | Репозиторий от куда загружать предыдущую конфигурацию.                                    |
+|local_git_repo                    | string         | def in var (/var/tmp/isc-bind-files) | Куда временно сохранить предыдущую конфигурацию.                                          |
 
 ## Теги
 |Тег                       | Описание                            |
@@ -101,4 +107,4 @@ Domain name server — приложение, предназначенное дл
     ```
 
 ## Дополнительные материалы
-
+- [BIND 9 Administrator Reference Manual](https://bind.isc.org/doc/arm/9.11/Bv9ARM.html)
