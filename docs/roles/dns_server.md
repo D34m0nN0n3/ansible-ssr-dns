@@ -63,9 +63,15 @@ Domain name server — приложение, предназначенное дл
 |local_git_repo                    | string         | def in var (/var/tmp/isc-bind-files) | |
 
 ## Теги
-|Тег            | Описание                     |
-|:--------------|:-----------------------------|
-
+|Тег                       | Описание                            |
+|:-------------------------|:------------------------------------|
+| bind_setupe              | Установка `BIND`                    |
+| bind_exporter_prometheus | Установка `exporter`                |
+| bind_configure           | Создание конфигурационных файлов    |
+| bind_copy_configs        | Копирование конфигурационных файлов |
+| bind_ip_v6_enable        | Настройка IPv6                      |
+| bind_create_zone         | Создание первой зоны                |
+| bind_restore_from_git    | Копирование предыдущей конфигурации |
 
 ## Примеры
 
