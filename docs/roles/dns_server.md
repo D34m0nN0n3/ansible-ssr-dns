@@ -24,12 +24,43 @@ Domain name server — приложение, предназначенное дл
     Роль настраивает два типа конфигураций: авторитативный DNS-сервер и кэширующий DNS-сервер, а так же их комбинацию.
 
 !!! info RPZ
-    Так же включена поддержка raesponse policy zone (зона политики ответа) - это механизм для введения настраиваемой политики на серверах системы доменных имен, чтобы рекурсивные распознаватели возвращали возможно измененные результаты.
+    Так же включена поддержка raesponse policy zone (зона политики ответа) - это механизм для введения настраиваемой политики на серверах системы доменных имен, чтобы рекурсивные распознаватели возвращали возможно измененные результаты. Зоны и их политика: "rpz.passeddomain.hosts" policy passthru; "rpz.changeddomain.hosts" policy given; "rpz.blockeddomain.hosts" policy nxdomain;
+
+!!! attention
+    Вместе с DNS сервером устанавливаются `node_exporter` и `bind_exporter`. Необходимо не забыть открыть в брандмауэр порты: `9100`, `9153`.
+
+!!! tip
+    Поддерживается загрузка предыдущей конфигурации из `git` репозитория.
 
 ## Параметры
 |Название переменной               | Тип переменной | Значения по умолчанию | Описание                                                    |
 |:---------------------------------|:--------------:|:---------------------:|:------------------------------------------------------------|
-
+|prometheus_user                   | string         |                       | |
+|node_exporter_url                 | string         |                       | |
+|bind_exporter_url                 | string         |                       | |
+|bind_forwarders                   | array          |                       | |
+|bind_acl_int                      | array          |                       | |
+|bind_acl_int_exclude              | array          |                       | |
+|bind_acl_ext                      | array          |                       | |
+|bind_acl_ext_exclude              | array          |                       | |
+|bind_acl_change                   | boolean        |                       | |
+|bind_cont_ph_num                  | string         |                       | |
+|bind_cont_mail                    | string         |                       | |
+|bind_srv_role                     | string         |                       | |
+|bind_srv_type                     | string         |                       | |
+|bind_ip_v6_on                     | boolean        |                       | |
+|bind_max_cache                    | string         |                       | |
+|bind_max_journal                  | string         |                       | |
+|bind_cleanig_interval             | string         |                       | |
+|alt_tranfer_src                   | boolean        |                       | |
+|mf_format                         | string         |                       | |
+|zero_ttl                          | boolean        |                       | |
+|trust_clients                     | array          |                       | |
+|trust_servers                     | array          |                       | |
+|empty_zone_name                   | string         |                       | |
+|bind_restore_last_conf            | boolean        |                       | |
+|remote_git_repo                   | string         |                       | |
+|local_git_repo                    | string         |                       | |
 
 ## Теги
 |Тег            | Описание                     |
