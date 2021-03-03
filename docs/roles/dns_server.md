@@ -62,7 +62,7 @@ Domain name server — приложение, предназначенное дл
 |mf_format                         | string         | undef                                | Задает формат зон: map, raw, text.                                                        |
 |zero_ttl                          | boolean        | undef                                | При возврате авторитетных отрицательных ответов на запросы SOA установите TTL записи SOA. |
 |trust_clients                     | array          | localhost                            | Задает список клиентов по умолчанию.                                                      |
-|trust_servers                     | array          | {{ ansible_all_ipv4_addresses }}     | Задает список серверов по умолчанию.                                                      |
+|trust_servers                     | array          | 'ansible_all_ipv4_addresses'         | Задает список серверов по умолчанию.                                                      |
 |empty_zone_name                   | string         | def in var (example.com)             | Задает имя первой зоны.                                                                   |
 |bind_restore_last_conf            | boolean        | def in var (false)                   | Задает нужно ли восстановить предыдущую конфигурацию.                                     |
 |remote_git_repo                   | string         | undef                                | Репозиторий от куда загружать предыдущую конфигурацию.                                    |
