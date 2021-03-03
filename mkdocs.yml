@@ -13,6 +13,7 @@ nav:
     - Роли:
       - ISC BIND 9: 'roles/dns_server.md'
       - resolv.conf: 'roles/dns_client.md'
+    - Структура git репозитория с предыдущей конфигурацией: 'git_last_conf.md'
     - Дополнительные материалы: 'seealso.md'
 
 plugins:
