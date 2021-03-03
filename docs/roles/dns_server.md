@@ -71,7 +71,27 @@ Domain name server — приложение, предназначенное дл
 
 !!! example "inventory/hosts"
     ``` ini
-
+    # Переменные которые необходимо заменить на свои значения указаны в '< >', значения указываются без них.
+    # Все узлы объединяются в группы ИС/АСУ.
+    # Данный фаил формируется в формате INI.
+    [all:vars]
+    bind_cont_ph_num='+7(000)111-22-33'
+    bind_cont_mail='mail@example.com'
+    bind_forwarders=['192.168.2.1','192.168.2.2']
+    alt_tranfer_src=True
+    bind_acl_int=['192.168.1.0/24','192.168.2.0/24']
+    bind_srv_type='mixed'
+    remote_git_repo='git@github.com:D34m0nN0n3/backup-isc-bind.git'
+    node_exporter_url='https://github.com/prometheus/node_exporter/releases/download/v1.1.1/node_exporter-1.1.1.linux-amd64.tar.gz'
+    bind_exporter_url='https://github.com/prometheus-community/bind_exporter/releases/download/v0.4.0/bind_exporter-0.4.0.linux-amd64.tar.gz'
+    ansible_connection=ssh
+    
+    [master]
+    bootstrap.lab ansible_connection=local
+    
+    [slaves]
+    rhel7.lab ansible_ssh_host=192.168.1.101
+    rhel8.lab ansible_ssh_host=192.168.1.102
     ```
 
 ## Дополнительные материалы
