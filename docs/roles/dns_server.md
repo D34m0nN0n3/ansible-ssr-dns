@@ -33,34 +33,34 @@ Domain name server — приложение, предназначенное дл
     Поддерживается загрузка предыдущей конфигурации из `git` репозитория.
 
 ## Параметры
-|Название переменной               | Тип переменной | Значения по умолчанию | Описание                                                    |
-|:---------------------------------|:--------------:|:---------------------:|:------------------------------------------------------------|
-|prometheus_user                   | string         |                       | |
-|node_exporter_url                 | string         |                       | |
-|bind_exporter_url                 | string         |                       | |
-|bind_forwarders                   | array          |                       | |
-|bind_acl_int                      | array          |                       | |
-|bind_acl_int_exclude              | array          |                       | |
-|bind_acl_ext                      | array          |                       | |
-|bind_acl_ext_exclude              | array          |                       | |
-|bind_acl_change                   | boolean        |                       | |
-|bind_cont_ph_num                  | string         |                       | |
-|bind_cont_mail                    | string         |                       | |
-|bind_srv_role                     | string         |                       | |
-|bind_srv_type                     | string         |                       | |
-|bind_ip_v6_on                     | boolean        |                       | |
-|bind_max_cache                    | string         |                       | |
-|bind_max_journal                  | string         |                       | |
-|bind_cleanig_interval             | string         |                       | |
-|alt_tranfer_src                   | boolean        |                       | |
-|mf_format                         | string         |                       | |
-|zero_ttl                          | boolean        |                       | |
-|trust_clients                     | array          |                       | |
-|trust_servers                     | array          |                       | |
-|empty_zone_name                   | string         |                       | |
-|bind_restore_last_conf            | boolean        |                       | |
-|remote_git_repo                   | string         |                       | |
-|local_git_repo                    | string         |                       | |
+|Название переменной               | Тип переменной | Значения по умолчанию                | Описание                                                    |
+|:---------------------------------|:--------------:|:------------------------------------:|:------------------------------------------------------------|
+|prometheus_user                   | string         | def in var (prometheus)              | |
+|node_exporter_url                 | string         | undef                                | |
+|bind_exporter_url                 | string         | undef                                | |
+|bind_forwarders                   | array          | undef                                | |
+|bind_acl_int                      | array          | undef                                | |
+|bind_acl_int_exclude              | array          | undef                                | |
+|bind_acl_ext                      | array          | def in var (any)                     | |
+|bind_acl_ext_exclude              | array          | undef                                | |
+|bind_acl_change                   | boolean        | undef (false)                        | |
+|bind_cont_ph_num                  | string         | undef                                | |
+|bind_cont_mail                    | string         | undef                                | |
+|bind_srv_role                     | string         | undef                                | |
+|bind_srv_type                     | string         | def in var (resolver)                | |
+|bind_ip_v6_on                     | boolean        | undef (false  )                      | |
+|bind_max_cache                    | string         | 256M                                 | |
+|bind_max_journal                  | string         | 500M                                 | |
+|bind_cleanig_interval             | string         | 60                                   | |
+|alt_tranfer_src                   | boolean        | undef (false)                        | |
+|mf_format                         | string         | undef                                | |
+|zero_ttl                          | boolean        | undef                                | |
+|trust_clients                     | array          | localhost                            | |
+|trust_servers                     | array          | {{ ansible_all_ipv4_addresses }}     | |
+|empty_zone_name                   | string         | def in var (example.com)             | |
+|bind_restore_last_conf            | boolean        | def in var (false)                   | |
+|remote_git_repo                   | string         | undef                                | |
+|local_git_repo                    | string         | def in var (/var/tmp/isc-bind-files) | |
 
 ## Теги
 |Тег            | Описание                     |

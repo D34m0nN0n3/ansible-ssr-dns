@@ -1,4 +1,12 @@
 ---
+- name: Check git repo is defined
+  block:
+    - debug:
+        msg: Please indicate git repo in the variable 'remote_git_repo'
+  always:
+    - meta: end_play
+  when: remote_git_repo is undefined 
+
 - name: Copy backups config from git repo and create facts
   block:
     - local_action:
