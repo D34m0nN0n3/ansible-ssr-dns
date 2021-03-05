@@ -16,19 +16,19 @@
         - bind_restore_from_git
 
     - set_fact:
-        named_zones: "{{lookup('file', '{{ local_git_repo }}/named.zones') }}"
+        named_zones: "{{ lookup('file', '{{ local_git_repo }}/named.zones') }}"
         cacheable: no
       tags:
         - bind_restore_from_git
 
     - set_fact:
-        internal_include_extanded: "{{lookup('file', '{{ local_git_repo }}/internal-include-extanded.conf') }}"
+        internal_include_extanded: "{{ lookup('file', '{{ local_git_repo }}/internal-include-extanded.conf') }}"
         cacheable: no
       tags:
         - bind_restore_from_git
 
     - set_fact:
-        external_include_extanded: "{{lookup('file', '{{ local_git_repo }}/external-include-extanded.conf') }}"
+        external_include_extanded: "{{ lookup('file', '{{ local_git_repo }}/external-include-extanded.conf') }}"
         cacheable: no
       tags:
         - bind_restore_from_git
