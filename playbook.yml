@@ -10,4 +10,4 @@
     - name: Configure DNS client
       include_role:
         name: infra-system.linux.os.resolv
-        
+...
