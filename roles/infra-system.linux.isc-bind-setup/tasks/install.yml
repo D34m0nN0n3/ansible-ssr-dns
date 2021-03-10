@@ -32,7 +32,7 @@
       changed_when: false
       when: (bind_srv_role is defined and bind_srv_role == 'slave')
 
-  rescue:
+  always:
     - name: Generate rndc key
       command: rndc-confgen -a -c "/etc/rndc.key"
       args:
