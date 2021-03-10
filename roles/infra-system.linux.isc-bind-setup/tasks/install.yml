@@ -35,7 +35,7 @@
       ignore_errors: yes
       when: (bind_srv_role is defined and bind_srv_role == 'slave') or
             (inventory_hostname in groups['slaves'])
-            
+
   tags:
     - bind_setupe
 
