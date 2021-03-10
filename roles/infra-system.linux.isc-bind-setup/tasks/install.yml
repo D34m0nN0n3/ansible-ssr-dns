@@ -31,9 +31,8 @@
         content: "{{ rndc_key_gen }}"
         dest: "/etc/rndc.key"
       changed_when: false
-      when: (rndc_key_gen is defined) and
-            (bind_srv_role is defined and bind_srv_role == 'slave') or
-            (inventory_hostname in groups['slaves'])
+      when: (bind_srv_role is defined and bind_srv_role == 'slave' and rndc_key_gen is defined) or
+            (inventory_hostname in groups['slaves'] and rndc_key_gen is defined)
             
   tags:
     - bind_setupe
