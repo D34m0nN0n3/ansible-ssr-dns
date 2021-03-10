@@ -21,16 +21,14 @@
     - name: Dynamic group for master
       group_by:
         key: dynamic_group_master
-      ignore_errors: yes
       when: (bind_srv_role is defined and bind_srv_role == 'master') or
-            (inventory_hostname in groups['master'])
+            ('master' in groups and groups['master']) and inventory_hostname in groups['master']
 
     - name: Dynamic group for slaves
       group_by:
         key: dynamic_group_slaves
-      ignore_errors: yes
       when: (bind_srv_role is defined and bind_srv_role == 'slave') or
-            (inventory_hostname in groups['slaves'])
+            ('slaves' in groups and groups['slaves']) and inventory_hostname in groups['slaves']
 
 - name: Create facts
   block:
@@ -201,9 +199,8 @@
         group: named
         mode: "0640"
         setype: named_cache_t
-      ignore_errors: yes
       when: (bind_srv_role is defined and bind_srv_role == 'master') or
-            (inventory_hostname in groups['master'])
+            ('master' in groups and groups['master']) and inventory_hostname in groups['master']
   when: ((bind_srv_type is defined and bind_srv_type == 'mixed') or (bind_srv_type is defined and bind_srv_type == 'authorized')) and bind_restore_last_conf | bool == false
   tags:
     - bind_configure
