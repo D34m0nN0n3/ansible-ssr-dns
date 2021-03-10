@@ -30,7 +30,7 @@
         enabled: yes
         masked: no
       register: result
-      when: ansible_facts.services['bind_exporter.service'] is defined
+      when: ansible_facts.services['bind_exporter.service'] is defined and ansible_facts.services['named-chroot.service'].state == 'running'
 
     - name: Enable node_exporter service
       systemd:
