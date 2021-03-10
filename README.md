@@ -6,7 +6,7 @@ Copyright (C) 2020 Dmitriy Prigoda deamon.none@gmail.com This script is free sof
 Протестировано на:
 - CentOS 7 & 8
 - Ansible = 2.9.5
-- foreman-1.22.0.36
+- foreman-1.22.0.36 & ansible-runner-1.4.7
 
 ## Общее описание
 Ansible Roles для установки и настройки сервера разрешения имен ISC BIND 9, а так же настройки DNS клиента в CentOS/RHEL 7 & 8.
