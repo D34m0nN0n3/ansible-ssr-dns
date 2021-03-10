@@ -22,6 +22,24 @@
         masked: no
       register: result
       when: ansible_facts.services['named-chroot.service'] is defined and ansible_facts.services['named-chroot.service'].status == 'disabled'
+
+    - name: Enable bind_exporter service
+      systemd:
+        name: bind_exporter
+        state: started
+        enabled: yes
+        masked: no
+      register: result
+      when: ansible_facts.services['bind_exporter.service'] is defined and ansible_facts.services['bind_exporter.service'].status == 'disabled'
+
+    - name: Enable node_exporter service
+      systemd:
+        name: node_exporter
+        state: started
+        enabled: yes
+        masked: no
+      register: result
+      when: ansible_facts.services['node_exporter.service'] is defined and ansible_facts.services['node_exporter.service'].status == 'disabled'
   when: (check_conf_result.rc == 0) and (check_zones_result.rc == 0)
 
 - name: Mail report
