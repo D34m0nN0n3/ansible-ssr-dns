@@ -201,7 +201,8 @@
         group: named
         mode: "0640"
         setype: named_cache_t
-      when: (inventory_hostname in groups['master'] or (bind_srv_role is defined and bind_srv_role == 'master'))
+      when: (bind_srv_role is defined and bind_srv_role == 'master') or
+            (inventory_hostname in groups['master'])
   when: ((bind_srv_type is defined and bind_srv_type == 'mixed') or (bind_srv_type is defined and bind_srv_type == 'authorized')) and bind_restore_last_conf | bool == false
   tags:
     - bind_configure
