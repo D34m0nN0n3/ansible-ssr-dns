@@ -56,7 +56,8 @@
         group: named
         mode: "0640"
         setype: named_cache_t
-      when: (inventory_hostname in groups['slaves'] or (bind_srv_role is defined and bind_srv_role == 'slave'))
+      when: (bind_srv_role is defined and bind_srv_role == 'slave') or
+            ('slaves' in groups and groups['slaves']) and inventory_hostname in groups['slaves']
 
     - name: Replace dir in external-include-extanded.conf
       replace:
@@ -67,7 +68,8 @@
         group: named
         mode: "0640"
         setype: named_cache_t
-      when: (inventory_hostname in groups['slaves'] or (bind_srv_role is defined and bind_srv_role == 'slave'))
+      when: (bind_srv_role is defined and bind_srv_role == 'slave') or
+            ('slaves' in groups and groups['slaves']) and inventory_hostname in groups['slaves']
 
     - name: Add include to internal view
       lineinfile:
@@ -147,7 +149,9 @@
   loop:
     - zones-internal.conf
     - zones-external.conf
-  when: (inventory_hostname in groups['master'] or (bind_srv_role is defined and bind_srv_role == 'master'))
+  when: (bind_srv_role is defined and bind_srv_role == 'master') or
+        ('master' in groups and groups['master']) and inventory_hostname in groups['master']
+
   tags:
     - bind_restore_from_git
 
@@ -162,7 +166,9 @@
   loop:
     - zones-internal.conf
     - zones-external.conf
-  when: (inventory_hostname in groups['slaves'] or (bind_srv_role is defined and bind_srv_role == 'slave'))
+  when: (bind_srv_role is defined and bind_srv_role == 'slave') or
+        ('slaves' in groups and groups['slaves']) and inventory_hostname in groups['slaves']
+
   tags:
     - bind_restore_from_git
 
@@ -175,7 +181,9 @@
     group: named
     mode: "0640"
     setype: named_cache_t
-  when: (inventory_hostname in groups['slaves'] or (bind_srv_role is defined and bind_srv_role == 'slave'))
+  when: (bind_srv_role is defined and bind_srv_role == 'slave') or
+        ('slaves' in groups and groups['slaves']) and inventory_hostname in groups['slaves']
+
   tags:
     - bind_restore_from_git
 
@@ -189,7 +197,9 @@
     setype: named_cache_t
   with_fileglob:
     - "{{ local_git_repo }}/masters/*"
-  when: (inventory_hostname in groups['master'] or (bind_srv_role is defined and bind_srv_role == 'master'))
+  when: (bind_srv_role is defined and bind_srv_role == 'master') or
+        ('master' in groups and groups['master']) and inventory_hostname in groups['master']
+
   tags:
     - bind_restore_from_git
 ...
