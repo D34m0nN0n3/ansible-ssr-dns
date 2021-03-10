@@ -19,7 +19,6 @@
       command: rndc-confgen -a -c "/etc/rndc.key"
       args:
         creates: "/etc/rndc.key"
-      ignore_errors: yes
       when: (bind_srv_role is defined and bind_srv_role == 'master')
 
     - set_fact:
@@ -31,14 +30,13 @@
         content: "{{ rndc_key_gen }}"
         dest: "/etc/rndc.key"
       changed_when: false
-      ignore_errors: yes
       when: (bind_srv_role is defined and bind_srv_role == 'slave')
+
   rescue:
     - name: Generate rndc key
       command: rndc-confgen -a -c "/etc/rndc.key"
       args:
         creates: "/etc/rndc.key"
-      ignore_errors: yes
       when: (inventory_hostname in groups['master'])
 
     - set_fact:
@@ -50,7 +48,6 @@
         content: "{{ rndc_key_gen }}"
         dest: "/etc/rndc.key"
       changed_when: false
-      ignore_errors: yes
       when: (inventory_hostname in groups['slaves'])
   tags:
     - bind_setupe
