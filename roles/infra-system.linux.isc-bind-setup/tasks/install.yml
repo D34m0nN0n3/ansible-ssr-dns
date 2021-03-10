@@ -19,6 +19,7 @@
       command: rndc-confgen -a -c "/etc/rndc.key"
       args:
         creates: "/etc/rndc.key"
+      ignore_errors: yes
       when: (bind_srv_role is defined and bind_srv_role == 'master') or
             (inventory_hostname in groups['master'])
 
@@ -31,6 +32,7 @@
         content: "{{ rndc_key_gen }}"
         dest: "/etc/rndc.key"
       changed_when: false
+      ignore_errors: yes
       when: (bind_srv_role is defined and bind_srv_role == 'slave') or
             (inventory_hostname in groups['slaves'])
             
