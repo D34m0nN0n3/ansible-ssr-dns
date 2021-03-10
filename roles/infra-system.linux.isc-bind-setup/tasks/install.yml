@@ -19,7 +19,8 @@
       command: rndc-confgen -a -c "/etc/rndc.key"
       args:
         creates: "/etc/rndc.key"
-      when: (bind_srv_role is defined and bind_srv_role == 'master')
+      when: (bind_srv_role is defined and bind_srv_role == 'master') or
+            ('master' in groups and groups['master']) and inventory_hostname in groups['master']
 
     - set_fact:
         rndc_key_gen: "{{lookup('file', '/etc/rndc.key') }}"
@@ -30,25 +31,8 @@
         content: "{{ rndc_key_gen }}"
         dest: "/etc/rndc.key"
       changed_when: false
-      when: (bind_srv_role is defined and bind_srv_role == 'slave')
-
-  always:
-    - name: Generate rndc key
-      command: rndc-confgen -a -c "/etc/rndc.key"
-      args:
-        creates: "/etc/rndc.key"
-      when: ('master' in groups and groups['master']) and inventory_hostname in groups['master']
-
-    - set_fact:
-        rndc_key_gen: "{{lookup('file', '/etc/rndc.key') }}"
-        cacheable: no
-
-    - name: Copy key to slaves nodes
-      copy:
-        content: "{{ rndc_key_gen }}"
-        dest: "/etc/rndc.key"
-      changed_when: false
-      when: ('slaves' in groups and groups['slaves']) and inventory_hostname in groups['slaves']
+      when: (bind_srv_role is defined and bind_srv_role == 'slave') or
+            ('slaves' in groups and groups['slaves']) and inventory_hostname in groups['slaves']
 
   tags:
     - bind_setupe
