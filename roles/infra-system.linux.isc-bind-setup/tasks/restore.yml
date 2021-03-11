@@ -86,6 +86,7 @@
     mode: "0640"
     setype: named_conf_t
   delegate_to: 127.0.0.1
+  become: false
   loop:
     - zones-internal.conf
     - zones-external.conf
@@ -103,6 +104,7 @@
     mode: "0640"
     setype: named_cache_t
   delegate_to: 127.0.0.1
+  become: false
   run_once: true
   tags:
   - bind_restore_from_git
@@ -117,6 +119,7 @@
     mode: "0640"
     setype: named_cache_t
   delegate_to: 127.0.0.1
+  become: false
   run_once: true
   tags:
     - bind_restore_from_git
@@ -131,6 +134,7 @@
     mode: "0640"
     setype: named_cache_t
   delegate_to: 127.0.0.1
+  become: false
   run_once: true
   tags:
     - bind_restore_from_git
