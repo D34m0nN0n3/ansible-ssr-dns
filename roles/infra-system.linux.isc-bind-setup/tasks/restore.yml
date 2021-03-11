@@ -7,13 +7,13 @@
     - meta: end_play
   when: remote_git_repo is undefined 
 
-- name: Get master hostname
-  set_fact:
-    master_fqdn_dynamic: "{% for host in groups['dynamic_group_master'] %}{{ hostvars[host]['ansible_fqdn'] }}{% if not loop.last %},{% endif %}{% endfor %}"
-    cacheable: no
-
 - name: Copy backups config from git repo and create facts
   block:
+    - name: Get master hostname
+      set_fact:
+        master_fqdn_dynamic: "{% for host in groups['dynamic_group_master'] %}{{ hostvars[host]['ansible_fqdn'] }}{% if not loop.last %},{% endif %}{% endfor %}"
+        cacheable: no
+
     - name: Clone repo
       git:
         repo: "{{ remote_git_repo }}"
@@ -21,30 +21,6 @@
         force: yes
       delegate_to: "{{ master_fqdn_dynamic }}"
       run_once: true
-      tags:
-        - bind_restore_from_git
-
-    - set_fact:
-        named_zones: "{{ lookup('file', '{{ local_git_repo }}/named.zones') }}"
-        cacheable: no
-      delegate_facts: true
-      delegate_to: "{{ master_fqdn_dynamic }}"
-      tags:
-        - bind_restore_from_git
-
-    - set_fact:
-        internal_include_extanded: "{{ lookup('file', '{{ local_git_repo }}/internal-include-extanded.conf') }}"
-        cacheable: no
-      delegate_facts: true
-      delegate_to: "{{ master_fqdn_dynamic }}"
-      tags:
-        - bind_restore_from_git
-
-    - set_fact:
-        external_include_extanded: "{{ lookup('file', '{{ local_git_repo }}/external-include-extanded.conf') }}"
-        cacheable: no
-      delegate_facts: true
-      delegate_to: "{{ master_fqdn_dynamic }}"
       tags:
         - bind_restore_from_git
 

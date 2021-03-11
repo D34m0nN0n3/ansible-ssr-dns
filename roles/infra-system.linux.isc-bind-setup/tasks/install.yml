@@ -23,7 +23,7 @@
             ('master' in groups and groups['master']) and inventory_hostname in groups['master']
 
     - set_fact:
-        rndc_key_gen: "{{lookup('file', '/etc/rndc.key') }}"
+        rndc_key_gen: "{{ lookup('file', '/etc/rndc.key') }}"
         cacheable: no
 
     - name: Copy key to slaves nodes
