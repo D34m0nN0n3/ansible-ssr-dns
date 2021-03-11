@@ -15,6 +15,7 @@
         dest: "{{ local_git_repo }}"
         force: yes
       delegate_to: 127.0.0.1
+      become: false
       run_once: true
       tags:
         - bind_restore_from_git
