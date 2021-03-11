@@ -9,8 +9,12 @@
 
 - name: Copy backups config from git repo and create facts
   block:
-    - local_action:
-        git repo="{{ remote_git_repo }}" dest="{{ local_git_repo }}" force=yes
+    - name: Clone repo
+      git:
+        repo: "{{ remote_git_repo }}"
+        dest: "{{ local_git_repo }}"
+        force: yes
+      delegate_to: {{ ip_master }}
       run_once: true
       tags:
         - bind_restore_from_git
