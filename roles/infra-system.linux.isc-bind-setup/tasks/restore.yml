@@ -7,6 +7,11 @@
     - meta: end_play
   when: remote_git_repo is undefined 
 
+- name: Get all hostname for NS RR
+  set_fact:
+    master_fqdn_dynamic: "{% for host in groups['dynamic_group_master'] %}{{ hostvars[host]['ansible_fqdn'] }}{% if not loop.last %},{% endif %}{% endfor %}"
+    cacheable: no
+
 - name: Copy backups config from git repo and create facts
   block:
     - name: Clone repo
@@ -14,7 +19,7 @@
         repo: "{{ remote_git_repo }}"
         dest: "{{ local_git_repo }}"
         force: yes
-      delegate_to: "{% for host in groups['dynamic_group_master'] %}{{ hostvars[host]['ansible_fqdn'] }}{% if not loop.last %},{% endif %}{% endfor %}"
+      delegate_to: "{{ master_fqdn_dynamic }}"
       run_once: true
       tags:
         - bind_restore_from_git
