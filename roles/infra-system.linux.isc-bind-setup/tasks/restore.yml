@@ -9,7 +9,7 @@
 
 - name: Get master hostname
   set_fact:
-    master_fqdn_dynamic: "{% for host in groups['dynamic_group_master'] %}{{ hostvars[host]['ansible_nodename'] }}{% if not loop.last %},{% endif %}{% endfor %}"
+    master_fqdn_dynamic: "{% for host in groups['dynamic_group_master'] %}{{ hostvars[host]['ansible_fqdn'] }}{% if not loop.last %},{% endif %}{% endfor %}"
     cacheable: no
 
 - name: Copy backups config from git repo and create facts
