@@ -1,5 +1,4 @@
 {% for host in play_hosts %}
-
 On the {{ host }}, ISC BIND status: {{ hostvars[host]['result']['state'] }}
 
 {% endfor %}
