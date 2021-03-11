@@ -1,4 +1,3 @@
 {% for host in groups['all'] %}
-Date: {{ ansible_date_time.date }}
 On the {{ hostvars[host]['ansible_fqdn'] }}, ISC BIND status: {{ hostvars[host]['result']['state'] }}
 {% endfor %}
