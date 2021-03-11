@@ -53,8 +53,9 @@
       mail:
         host: "{{ mail_host }}"
         port: "{{ mail_port | default('25') }}"
+        from: "{{ ansible_user_id }}@{{ ansible_domain }}"
         to: "{{ mail_rcpt_to }}"
-        subject: 'ISC BIND install.'
+        subject: 'Ansible-report: ISC BIND setup.'
         body: "{{ lookup('template', 'templates/mail_body.j2') }}"
       ignore_errors: yes
       run_once: True
