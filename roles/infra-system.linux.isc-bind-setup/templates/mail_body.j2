@@ -1,3 +1,3 @@
-{% for host in play_hosts_all %}
-On the {{ hostvars[host]['ansible_fqdn'] }}, ISC BIND status: {{ hostvars[host]['result']['state'] }}
+{% for host in ansible_play_hosts_all %}
+On the {{ host }}, ISC BIND status: {{ hostvars[host]['result']['state'] }}
 {% endfor %}
