@@ -9,17 +9,12 @@
 
 - name: Copy backups config from git repo and create facts
   block:
-    - name: Get master hostname
-      set_fact:
-        master_fqdn_dynamic: "{% for host in groups['dynamic_group_master'] %}{{ hostvars[host]['ansible_fqdn'] }}{% if not loop.last %},{% endif %}{% endfor %}"
-        cacheable: no
-
     - name: Clone repo
       git:
         repo: "{{ remote_git_repo }}"
         dest: "{{ local_git_repo }}"
         force: yes
-      delegate_to: "{{ master_fqdn_dynamic }}"
+      delegate_to: 127.0.0.1
       run_once: true
       tags:
         - bind_restore_from_git
@@ -39,7 +34,6 @@
         group: named
         mode: "0650"
         setype: named_conf_t
-        remote_src: yes
       loop:
         - internal-include-extanded.conf
         - external-include-extanded.conf
@@ -90,7 +84,7 @@
     group: named
     mode: "0640"
     setype: named_conf_t
-  delegate_to: "{{ master_fqdn_dynamic }}"
+  delegate_to: 127.0.0.1
   loop:
     - zones-internal.conf
     - zones-external.conf
@@ -107,7 +101,7 @@
     group: named
     mode: "0640"
     setype: named_cache_t
-  delegate_to: "{{ master_fqdn_dynamic }}"
+  delegate_to: 127.0.0.1
   run_once: true
   tags:
   - bind_restore_from_git
@@ -121,7 +115,7 @@
     group: named
     mode: "0640"
     setype: named_cache_t
-  delegate_to: "{{ master_fqdn_dynamic }}"
+  delegate_to: 127.0.0.1
   run_once: true
   tags:
     - bind_restore_from_git
@@ -135,7 +129,7 @@
     group: named
     mode: "0640"
     setype: named_cache_t
-  delegate_to: "{{ master_fqdn_dynamic }}"
+  delegate_to: 127.0.0.1
   run_once: true
   tags:
     - bind_restore_from_git
@@ -170,7 +164,6 @@
     group: named
     mode: "0650"
     setype: named_conf_t
-    remote_src: yes
   loop:
     - zones-internal.conf
     - zones-external.conf
@@ -220,7 +213,6 @@
     group: named
     mode: "0640"
     setype: named_cache_t
-    remote_src: yes
   with_fileglob:
     - "{{ local_git_repo }}/masters/*"
   when: (bind_srv_role is defined and bind_srv_role == 'master') or
