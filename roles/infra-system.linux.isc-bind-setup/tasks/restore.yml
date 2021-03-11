@@ -27,18 +27,24 @@
     - set_fact:
         named_zones: "{{ lookup('file', '{{ local_git_repo }}/named.zones') }}"
         cacheable: no
+      delegate_facts: true
+      delegate_to: "{{ master_fqdn_dynamic }}"
       tags:
         - bind_restore_from_git
 
     - set_fact:
         internal_include_extanded: "{{ lookup('file', '{{ local_git_repo }}/internal-include-extanded.conf') }}"
         cacheable: no
+      delegate_facts: true
+      delegate_to: "{{ master_fqdn_dynamic }}"
       tags:
         - bind_restore_from_git
 
     - set_fact:
         external_include_extanded: "{{ lookup('file', '{{ local_git_repo }}/external-include-extanded.conf') }}"
         cacheable: no
+      delegate_facts: true
+      delegate_to: "{{ master_fqdn_dynamic }}"
       tags:
         - bind_restore_from_git
 
