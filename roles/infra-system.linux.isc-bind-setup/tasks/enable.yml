@@ -56,7 +56,7 @@
         to: "{{ mail_rcpt_to }}"
         subject: 'ISC BIND install.'
         body: "{{ lookup('template', 'templates/mail_body.j2') }}"
-      delegate_to: localhost
+      delegate_to: "{{ master_fqdn_dynamic }}"
       ignore_errors: yes
       run_once: True
   when: mail_host is defined
