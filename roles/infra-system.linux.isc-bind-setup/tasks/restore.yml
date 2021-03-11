@@ -95,8 +95,14 @@
         state: present
 
 - name: Create temp zones config
-  local_action:
-    copy content="{{ named_zones }}" dest="{{ local_git_repo }}/{{ item }}" owner=root group=named mode="0640" setype=named_conf_t
+  copy:
+    content: "{{ named_zones }}"
+    dest: "{{ local_git_repo }}/{{ item }}"
+    owner: root
+    group: named
+    mode: "0640"
+    setype: named_conf_t
+  delegate_to: "{{ master_fqdn_dynamic }}"
   loop:
     - zones-internal.conf
     - zones-external.conf
@@ -105,22 +111,43 @@
     - bind_restore_from_git
 
 - name: Replace type zone master to slave
-  local_action:
-    replace path="{{ local_git_repo }}/zones-external.conf" regexp='type(\s*)master\;' replace='type slave;\n\t\t masters { {{ ip_master }}; };' owner=root group=named mode="0640" setype=named_cache_t
+  replace:
+    path: "{{ local_git_repo }}/zones-external.conf"
+    regexp: 'type(\s*)master\;'
+    replace: 'type slave;\n\t\t masters { {{ ip_master }}; };'
+    owner: root
+    group: named
+    mode: "0640"
+    setype: named_cache_t
+  delegate_to: "{{ master_fqdn_dynamic }}"
   run_once: true
   tags:
   - bind_restore_from_git
 
 - name: Replace dir in internal view
-  local_action:
-    replace path="{{ local_git_repo }}/zones-internal.conf" regexp='/var/named/slaves/' replace='/var/named/slaves/internal/' owner=root group=named mode="0640" setype=named_cache_t
+  replace:
+    path: "{{ local_git_repo }}/zones-internal.conf"
+    regexp: '/var/named/slaves/'
+    replace: '/var/named/slaves/internal/'
+    owner: root
+    group: named
+    mode: "0640"
+    setype: named_cache_t
+  delegate_to: "{{ master_fqdn_dynamic }}"
   run_once: true
   tags:
     - bind_restore_from_git
 
 - name: Replace dir in external view
-  local_action:
-    replace path="{{ local_git_repo }}/zones-external.conf" regexp='(/var/named/masters/|/var/named/slaves/)' replace='/var/named/slaves/external/' owner=root group=named mode="0640" setype=named_cache_t
+  replace:
+    path: "{{ local_git_repo }}/zones-external.conf"
+    regexp: '(/var/named/masters/|/var/named/slaves/)'
+    replace: '/var/named/slaves/external/'
+    owner: root
+    group: named
+    mode: "0640"
+    setype: named_cache_t
+  delegate_to: "{{ master_fqdn_dynamic }}"
   run_once: true
   tags:
     - bind_restore_from_git
