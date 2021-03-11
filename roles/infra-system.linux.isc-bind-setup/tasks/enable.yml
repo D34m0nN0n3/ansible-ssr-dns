@@ -49,11 +49,16 @@
         mail_rcpt_to: bind_cont_mail
       when: mail_rcpt_to is undefined
 
+    - name: FROM
+      set_fact: 
+        mail_from: "{{ ansible_user_id }}@{{ ansible_domain }}"
+      when: mail_from is undefined
+
     - name: Send mail report
       mail:
         host: "{{ mail_host }}"
         port: "{{ mail_port | default('25') }}"
-        from: "{{ ansible_user_id }}@{{ ansible_domain }}"
+        from: "{{ mail_from }}"
         to: "{{ mail_rcpt_to }}"
         subject: 'Ansible-report: ISC BIND setup.'
         body: "{{ lookup('template', 'templates/mail_body.j2') }}"
