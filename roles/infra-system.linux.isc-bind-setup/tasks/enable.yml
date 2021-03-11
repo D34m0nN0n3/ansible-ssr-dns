@@ -51,7 +51,7 @@
 
     - name: FROM
       set_fact: 
-        mail_from: "{{ ansible_user_id }}@{{ ansible_domain }}"
+        mail_from: "{{ ansible_user_id + @ + ansible_domain }}"
       when: mail_from is undefined
 
     - name: Send mail report
