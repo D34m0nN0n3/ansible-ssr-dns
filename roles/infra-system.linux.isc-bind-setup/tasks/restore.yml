@@ -14,7 +14,7 @@
         repo: "{{ remote_git_repo }}"
         dest: "{{ local_git_repo }}"
         force: yes
-      delegate_to: "{{ ip_master }}"
+      delegate_to: "{% for host in groups['dynamic_group_master'] %}{{ hostvars[host]['ansible_fqdn'] }}{% if not loop.last %},{% endif %}{% endfor %}"
       run_once: true
       tags:
         - bind_restore_from_git
