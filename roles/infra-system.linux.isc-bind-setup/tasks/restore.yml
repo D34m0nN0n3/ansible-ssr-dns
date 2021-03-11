@@ -24,6 +24,11 @@
       tags:
         - bind_restore_from_git
 
+    - name: Temp zones config
+      set_fact:
+        named_zones: "{{ local_git_repo }}/named.zones"
+
+
 - name: Configure extands
   block:
     - name: Copy internal-include-extanded.conf & external-include-extanded.conf
@@ -85,7 +90,6 @@
     group: named
     mode: "0640"
     setype: named_conf_t
-    remote_src: yes
   delegate_to: "{{ master_fqdn_dynamic }}"
   loop:
     - zones-internal.conf
