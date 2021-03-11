@@ -21,8 +21,8 @@
 
     - name: Temp zones config
       set_fact:
-        named_zones: "{{ local_git_repo }}/named.zones"
-
+        named_zones: "{{ lookup('file', '{{ local_git_repo }}/named.zones') }}"
+        cacheable: no
 
 - name: Configure extands
   block:
