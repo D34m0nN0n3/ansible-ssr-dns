@@ -170,6 +170,7 @@
     group: named
     mode: "0650"
     setype: named_conf_t
+    remote_src: yes
   loop:
     - zones-internal.conf
     - zones-external.conf
