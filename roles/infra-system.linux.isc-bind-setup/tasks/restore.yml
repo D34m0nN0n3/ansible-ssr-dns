@@ -81,10 +81,6 @@
   copy:
     content: "{{ named_zones }}"
     dest: "{{ local_git_repo }}/{{ item }}"
-    owner: root
-    group: named
-    mode: "0640"
-    setype: named_conf_t
   delegate_to: 127.0.0.1
   become: false
   loop:
@@ -99,10 +95,6 @@
     path: "{{ local_git_repo }}/zones-external.conf"
     regexp: 'type(\s*)master\;'
     replace: 'type slave;\n\t\t masters { {{ ip_master }}; };'
-    owner: root
-    group: named
-    mode: "0640"
-    setype: named_cache_t
   delegate_to: 127.0.0.1
   become: false
   run_once: true
@@ -114,10 +106,6 @@
     path: "{{ local_git_repo }}/zones-internal.conf"
     regexp: '/var/named/slaves/'
     replace: '/var/named/slaves/internal/'
-    owner: root
-    group: named
-    mode: "0640"
-    setype: named_cache_t
   delegate_to: 127.0.0.1
   become: false
   run_once: true
@@ -129,10 +117,6 @@
     path: "{{ local_git_repo }}/zones-external.conf"
     regexp: '(/var/named/masters/|/var/named/slaves/)'
     replace: '/var/named/slaves/external/'
-    owner: root
-    group: named
-    mode: "0640"
-    setype: named_cache_t
   delegate_to: 127.0.0.1
   become: false
   run_once: true
