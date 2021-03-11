@@ -63,6 +63,7 @@
         to: "{{ mail_rcpt_to }}"
         subject: 'Ansible-report: ISC BIND setup.'
         body: "{{ lookup('template', 'templates/mail_body.j2') }}"
+      delegate_to: 127.0.0.1
       ignore_errors: yes
       run_once: True
   when: mail_host is defined
