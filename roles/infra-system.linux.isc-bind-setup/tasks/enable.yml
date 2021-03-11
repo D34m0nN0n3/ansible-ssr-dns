@@ -65,6 +65,7 @@
         body: "{{ lookup('template', 'templates/mail_body.j2') }}"
       delegate_to: 127.0.0.1
       ignore_errors: yes
-      run_once: True
+      become: false
+      run_once: true
   when: mail_host is defined
 ...
