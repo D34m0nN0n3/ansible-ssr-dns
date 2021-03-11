@@ -14,7 +14,7 @@
         repo: "{{ remote_git_repo }}"
         dest: "{{ local_git_repo }}"
         force: yes
-      delegate_to: {{ ip_master }}
+      delegate_to: "{{ ip_master }}"
       run_once: true
       tags:
         - bind_restore_from_git
