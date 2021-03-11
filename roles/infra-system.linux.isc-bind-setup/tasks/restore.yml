@@ -34,6 +34,7 @@
         group: named
         mode: "0650"
         setype: named_conf_t
+        remote_src: yes
       loop:
         - internal-include-extanded.conf
         - external-include-extanded.conf
