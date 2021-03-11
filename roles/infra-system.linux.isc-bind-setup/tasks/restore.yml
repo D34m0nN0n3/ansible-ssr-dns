@@ -148,7 +148,7 @@
   tags:
     - bind_restore_from_git
 
-- name: Create dir for master zones files
+- name: Create dir for slaves zones files
   file:
     path: "/var/named/slaves/{{ item }}"
     state: directory
@@ -219,6 +219,7 @@
     group: named
     mode: "0640"
     setype: named_cache_t
+    remote_src: yes
   with_fileglob:
     - "{{ local_git_repo }}/masters/*"
   when: (bind_srv_role is defined and bind_srv_role == 'master') or
