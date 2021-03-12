@@ -16,3 +16,6 @@ bind_restore_last_conf: False
 
 # Git clone dir
 local_git_repo: '/var/tmp/isc-bind-files'
+
+# Path for backup
+bind_backup_dir: '/var/tmp/'

@@ -64,6 +64,7 @@ Domain name server — приложение, предназначенное дл
 |trust_clients                     | array          | localhost                            | Задает список клиентов по умолчанию.                                                      |
 |trust_servers                     | array          | 'ansible_all_ipv4_addresses'         | Задает список серверов по умолчанию.                                                      |
 |empty_zone_name                   | string         | def in var (example.com)             | Задает имя первой зоны.                                                                   |
+|bind_backup_dir                   | string         | def in var (/var/tmp/)               | Директория для резервного копирования конфигурации.                                       |
 |bind_restore_last_conf            | boolean        | def in var (false)                   | Задает нужно ли восстановить предыдущую конфигурацию.                                     |
 |remote_git_repo                   | string         | undef                                | Репозиторий от куда загружать предыдущую конфигурацию.                                    |
 |local_git_repo                    | string         | def in var (/var/tmp/isc-bind-files) | Куда временно сохранить предыдущую конфигурацию.                                          |

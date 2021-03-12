@@ -118,6 +118,40 @@
   tags:
     - bind_setupe
 
+- name: Create ISC BIND backup
+  block:
+    - name: Add BIND backup dir environment
+      lineinfile:
+        dest: "/etc/environment"
+        state: present
+        insertafter: EOF
+        line: "BIND_BACKUP_DIR={{ bind_backup_dir }}"
+
+    - name: Copy BIND backup script
+      copy:
+        src: bind-backup-incremental
+        dest: /usr/bin/bind-backup-incremental
+        owner: root
+        group: root
+        mode: "0750"
+
+    - name: Copy BIND backup systemd service and timer
+      copy:
+        src: "{{ item }}"
+        dest: "/etc/systemd/system/{{ item }}"
+        owner: root
+        group: root
+        mode: "0644"
+      loop:
+        - bind-backup-incremental.service
+        - bind-backup-incremental.timer
+      notify: 
+        - BIND_backup
+
+  tags:
+    - bind_setupe
+    - bind_backup
+
 - name: Create bind_exporter for prometheus
   block:
     - name: Insatllation node_exporter and bind_exporter

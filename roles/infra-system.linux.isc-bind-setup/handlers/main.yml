@@ -3,3 +3,12 @@
   systemd:
     name: named-chroot
     state: restarted
+
+- name: BIND_backup
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    masked: no
+  loop:
+    - bind-backup-incremental.service
+    - bind-backup-incremental.timer

@@ -1,0 +1,9 @@
+[Unit]
+Description=Backup of /etc/named /etc/named.conf /etc/rndc.key /var/named/ configuration
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bind-backup-incremental
+
+[Install]
+WantedBy=multi-user.target

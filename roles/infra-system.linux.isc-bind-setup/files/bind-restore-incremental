@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Copyright (C) 2019 Dmitriy Prigoda <deamon.none@gmail.com> 
+# This script is free software: Everyone is permitted to copy and distribute verbatim copies of 
+# the GNU General Public License as published by the Free Software Foundation, either version 3
+# of the License, but changing it is not allowed.
+# Restore incriment backups
+
+function panic {
+  local error_code=${1} ; shift
+  echo "Error: ${@}" 1>&2
+  exit ${error_code}
+}
+
+[[ ! -d ${BIND_BACKUP_DIR} ]] && panic 1 "The ${BIND_BACKUP_DIR} doesn't exist."
+
+for FILE in ${BIND_BACKUP_DIR}bind-confis.tar.bz2.{0..6}; do [ -f $FILE ] && tar -xjpvf $FILE; done && echo "Complete restore."
+#END
