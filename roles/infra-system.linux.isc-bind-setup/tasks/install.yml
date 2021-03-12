@@ -115,6 +115,9 @@
     owner: root
     group: named
     mode: "0750"
+    seuser: unconfined_u
+    serole: object_r
+    setype: bin_t
   tags:
     - bind_setupe
 
@@ -134,6 +137,9 @@
         owner: root
         group: named
         mode: "0750"
+        seuser: system_u
+        serole: object_r
+        setype: bin_t
 
     - name: Copy BIND backup systemd service and timer
       template:
@@ -142,6 +148,9 @@
         owner: root
         group: named
         mode: "0644"
+        seuser: system_u
+        serole: object_r
+        setype: systemd_unit_file_t
       loop:
         - bind-backup-incremental.service
         - bind-backup-incremental.timer
@@ -184,6 +193,9 @@
         remote_src: yes
         owner: root
         group: root
+        seuser: unconfined_u
+        serole: object_r
+        setype: bin_t
         creates: "/usr/local/bin/node_exporter"
         extra_opts:
           - "--strip-components"
@@ -196,6 +208,9 @@
         remote_src: yes
         owner: root
         group: root
+        seuser: unconfined_u
+        serole: object_r
+        setype: bin_t
         creates: "/usr/local/bin/bind_exporter"
         extra_opts:
           - "--strip-components"
@@ -208,6 +223,9 @@
         owner: root
         group: root
         mode: "0644"
+        seuser: system_u
+        serole: object_r
+        setype: systemd_unit_file_t
       loop:
         - node_exporter.service
         - bind_exporter.service
