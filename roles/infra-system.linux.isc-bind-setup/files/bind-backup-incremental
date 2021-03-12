@@ -15,5 +15,6 @@ function panic {
 
 [[ ! -d ${BIND_BACKUP_DIR} ]] && panic 1 "The ${BIND_BACKUP_DIR} doesn't exist."
 
-tar -N $(date +%Y-%m-%d) -jpcv -f ${BIND_BACKUP_DIR}bind-confis.tar.bz2.$index /etc/named.conf /etc/rndc.key /etc/named /var/named/ --exclude='/var/named/chroot/*' && echo "Complete backup."
+tar -N $(date +%Y-%m-%d) -jpcv -f ${BIND_BACKUP_DIR}bind-confis.tar.bz2.$index /etc/named.conf /etc/rndc.key /etc/named /var/named/ --exclude='/var/named/chroot/*' > /dev/null 2>&1 && echo "Complete backup."
+exit 0
 #END
