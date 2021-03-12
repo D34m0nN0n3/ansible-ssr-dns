@@ -145,7 +145,7 @@
       loop:
         - bind-backup-incremental.service
         - bind-backup-incremental.timer
-      notify: 
+      notify:
         - BIND_backup
 
   tags:

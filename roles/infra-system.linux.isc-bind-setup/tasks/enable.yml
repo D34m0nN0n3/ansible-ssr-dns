@@ -14,6 +14,13 @@
     - name: Check service facts
       service_facts:
 
+    - name: Restart service ISC BIND if running
+      assert:
+        that:
+          - "'{{ ansible_facts.services['named-chroot.service'].state }}' == 'running'"
+      notify:
+        - Restart_BIND
+
     - name: Enable service ISC BIND and ensure it is not masked
       systemd:
         name: named-chroot
