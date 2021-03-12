@@ -2,8 +2,13 @@
 Description=Backup of /etc/named /etc/named.conf /etc/rndc.key /var/named/ configuration
 
 [Service]
+Environment="BIND_BACKUP_DIR={{ bind_backup_dir }}"
 Type=oneshot
+User=named
+Group=named
 ExecStart=/usr/bin/bind-backup-incremental
+TimeoutStartSec=0
+RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target

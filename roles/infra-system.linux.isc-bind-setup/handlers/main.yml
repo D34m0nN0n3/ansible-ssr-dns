@@ -6,9 +6,6 @@
 
 - name: BIND_backup
   systemd:
-    name: "{{ item }}"
+    name: bind-backup-incremental.timer
     enabled: yes
     masked: no
-  loop:
-    - bind-backup-incremental.service
-    - bind-backup-incremental.timer

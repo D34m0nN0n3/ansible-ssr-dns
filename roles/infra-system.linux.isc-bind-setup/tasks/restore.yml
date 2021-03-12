@@ -123,14 +123,6 @@
   tags:
     - bind_restore_from_git
 
-- name: Purge attributes
-  lineinfile:
-    path: "{{ local_git_repo }}/zones-external.conf"
-    regexp: '^\s*notify\syes\;$'
-    state: absent
-  tags:
-    - bind_restore_from_git
-
 - name: Create dir for slaves zones files
   file:
     path: "/var/named/slaves/{{ item }}"
@@ -188,6 +180,25 @@
     group: named
     mode: "0640"
     setype: named_cache_t
+  when: (bind_srv_role is defined and bind_srv_role == 'slave') or
+        ('slaves' in groups and groups['slaves']) and inventory_hostname in groups['slaves']
+
+  tags:
+    - bind_restore_from_git
+
+- name: Purge attributes for external zones
+  lineinfile:
+    path: "/etc/named/zones-external.conf"
+    regexp: '^\s*notify\syes\;$'
+    state: absent
+  tags:
+    - bind_restore_from_git
+
+- name: Purge attributes for all zones on slaves
+  lineinfile:
+    path: "/etc/named/zones-external.conf"
+    regexp: '^\s*notify\syes\;$'
+    state: absent
   when: (bind_srv_role is defined and bind_srv_role == 'slave') or
         ('slaves' in groups and groups['slaves']) and inventory_hostname in groups['slaves']
 
