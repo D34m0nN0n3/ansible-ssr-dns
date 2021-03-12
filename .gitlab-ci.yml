@@ -33,7 +33,7 @@
       script:
         - sudo rm -rf /var/www/base/docs/"$DIR_NAME"
         - cd /home/gitlab-runner/$CI_PROJECT_NAME/
-        - sudo mv site/* /var/www/base/docs/"$DIR_NAME"
+        - sudo mv site/* /var/www/base/docs/"$DIR_NAME"/
     cleanup_post:
       tags:
         - mkdocs
