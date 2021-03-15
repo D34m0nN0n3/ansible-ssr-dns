@@ -28,6 +28,7 @@
     seuser: system_u
     serole: object_r
     setype: dnsmasq_etc_t
+    backup: yes
   loop:
     - dnsmasq.conf
     - resolv.dnsmasq
@@ -42,6 +43,7 @@
     seuser: system_u
     serole: object_r
     setype: net_conf_t
+    backup: yes
   notify:
     - reload NetworkManager
 
