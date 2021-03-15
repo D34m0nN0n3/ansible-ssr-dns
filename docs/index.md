@@ -17,4 +17,3 @@
 - [Git Documentations](https://git-scm.com/book/en/v2)
 - [GitHub Documentations](https://docs.github.com/en)
 - [GitLab Documentations](https://docs.gitlab.com/)
-   
