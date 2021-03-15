@@ -18,7 +18,17 @@ function print_usage_short {
     echo "Get help: \"$0\" for help (-h | --help)"
 }
 
-function print_usage_short {
+if  [[ $1 == "\-h" ]] ; then
+    print_usage_short
+    exit 1
+    else
+    if [ $# -lt "$MINARG" ] ; then
+    print_usage_short
+    exit 1
+    fi
+fi
+
+function print_usage {
 cat <<EOF
 Use this script: \"$0\" <domain> <file zone>
 
@@ -26,14 +36,9 @@ Use this script: \"$0\" <domain> <file zone>
 EOF
 }
 
-if  [[ $1 == "\-h" ]] || [[ $1 == "\-\-h" ]] ; then
+if  [[ $1 == "\-\-h" ]] ; then
     print_usage
     exit 1
-    else
-    if [ $# -lt "$MINARG" ] ; then
-    print_usage_short
-    exit 1
-    fi
 fi
 
 PACKAGES=( bash )

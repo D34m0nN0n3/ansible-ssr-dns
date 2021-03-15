@@ -1,3 +1,10 @@
+<h1><span style="text-decoration: underline;"><em>Report</em></span></h1>
+<p>&nbsp;</p>
+<ul>
 {% for host in play_hosts %}
-On the {{ host }}, ISC BIND status: {{ hostvars[host]['result']['state'] }}
+<li>
+<h2>On&nbsp;the&nbsp;<em>&nbsp;{{ host }}&nbsp;</em>,&nbsp;ISC&nbsp;BIND&nbsp;status:&nbsp;<em>&nbsp;{{ hostvars[host]['result']['state'] }}&nbsp;</em></h2>
+</li>
 {% endfor %}
+</ul>
+<div>&nbsp;</div>
