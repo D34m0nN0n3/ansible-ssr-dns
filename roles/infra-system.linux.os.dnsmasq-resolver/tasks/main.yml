@@ -18,6 +18,23 @@
     backup: yes
   when: (ansible_os_family == 'RedHat' and ansible_distribution_major_version >= '7')
 
+- name: Create user and group for DNSMASQ
+  block:
+    - name: Ensure group DNSMASQ exists
+      group:
+        state: present
+        system: yes
+        name: dnsmasq
+
+    - name: Create user DNSMASQ
+      user:
+        state: present
+        system: yes
+        name: dnsmasq
+        group: dnsmasq
+        shell: "/sbin/nologin"
+  when: (ansible_os_family == 'RedHat' and ansible_distribution_major_version== '7')
+
 - name: Copy DNSMASQ configuration
   template:
     src: "{{ item }}.j2"
@@ -44,6 +61,12 @@
     serole: object_r
     setype: net_conf_t
     backup: yes
+
+- name: Start and enable service DNSMASQ
+  service:
+    name: dnsmasq
+    state: started
+    enabled: yes
   notify:
     - reload NetworkManager
 
