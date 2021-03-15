@@ -22,6 +22,7 @@ acl internal {
 {%    if bind_acl_int_exclude is defined %}
         !internal-exclude;
 {%    endif %}
+        trusted_servers;
 {% for acl_int in bind_acl_int %}
 {%   if acl_int is string or acl_int is iterable %}
         {{ macros.listify(acl_int) }}
@@ -49,6 +50,7 @@ acl external {
 {%    if bind_acl_ext_exclude is defined %}
         !external-exclude;
 {%    endif %}
+        trusted_clients;
 {% for acl_ext in bind_acl_ext %}
 {%   if acl_ext is string or acl_ext is iterable %}
         {{ macros.listify(acl_ext) }}
