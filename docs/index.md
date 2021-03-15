@@ -7,6 +7,7 @@
 
 * infra-system.linux.isc-bind-setup
 * infra-system.linux.os.resolv
+* infra-system.linux.os.dnsmasq-resolver
 
 !!! tip
     Для создания закладки в браузере на данное руководство: ++ctrl+d++

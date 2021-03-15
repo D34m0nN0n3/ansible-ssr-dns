@@ -1,0 +1,48 @@
+---
+- name: Insatllation DNSMASQ
+  package:
+    name: dnsmasq
+    state: present
+
+- name: Make sure line 'dns=dnsmasq' is set in /etc/NetworkManager/NetworkManager.conf
+  ini_file:
+    path: /etc/NetworkManager/NetworkManager.conf
+    state: present
+    no_extra_spaces: yes
+    section: main
+    option: dns
+    value: dnsmasq
+    owner: root
+    group: root
+    mode: "0644"
+    backup: yes
+  when: (ansible_os_family == 'RedHat' and ansible_distribution_major_version >= '7')
+
+- name: Copy DNSMASQ configuration
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/{{ item }}"
+    owner: root
+    group: dnsmasq
+    mode: "0644"
+    seuser: system_u
+    serole: object_r
+    setype: dnsmasq_etc_t
+  loop:
+    - dnsmasq.conf
+    - resolv.dnsmasq
+
+- name: Copy resolv.config
+  copy:
+    src: resolv.conf
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: "0644"
+    seuser: system_u
+    serole: object_r
+    setype: net_conf_t
+  notify:
+    - reload NetworkManager
+
+...

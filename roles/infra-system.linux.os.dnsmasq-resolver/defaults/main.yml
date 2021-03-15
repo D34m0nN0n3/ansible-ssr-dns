@@ -1,0 +1,5 @@
+---
+# The directive is an obsolete name for the search
+dns_domain: "{{ ansible_domain }}"
+# Name server IP address
+nameserver: ['1.1.1.1','8.8.8.8']

@@ -7,7 +7,7 @@
       include_role:
         name: infra-system.linux.isc-bind-setup
 
-    - name: Configure DNS client
+    - name: Configure DNS client with DNSMASQ
       include_role:
-        name: infra-system.linux.os.resolv
+        name: infra-system.linux.os.dnsmasq-resolver
 ...

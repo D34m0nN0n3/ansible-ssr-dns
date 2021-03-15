@@ -1,0 +1,22 @@
+galaxy_info:
+  role_name: infra-system.linux.os.dnsmasq-resolv
+  author: Dmitriy Prigoda
+  description: Configure DNS client on Centos/RHEL7/8 with dnsmasq
+
+  license: license (GPL-3.0-only)
+
+  min_ansible_version: 2.9
+
+  platforms:
+    - name: EL
+      versions:
+        - 7
+        - 8
+
+  galaxy_tags: 
+    - dns
+    - resolv
+    - networking
+    - system
+
+dependencies: []
