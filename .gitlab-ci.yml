@@ -12,6 +12,7 @@
         - mkdocs
       stage: pre
       script:
+        - rm -rf /home/gitlab-runner/builds/*
         - if [ -d /home/gitlab-runner/$CI_PROJECT_NAME ]; then sudo rm -rf /home/gitlab-runner/$CI_PROJECT_NAME; fi
     clone_config:
       tags:
