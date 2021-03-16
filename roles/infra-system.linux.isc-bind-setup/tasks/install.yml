@@ -108,16 +108,19 @@
   tags:
     - bind_setupe
 
-- name: Copy edit zone script
+- name: Copy edit zone script and healthy check script
   copy:
-    src: named-editzone.bash
-    dest: /usr/local/bin/named-editzone
+    src: "{{ item }}.bash"
+    dest: "/usr/local/bin/{{ item }}"
     owner: root
     group: named
     mode: "0750"
     seuser: unconfined_u
     serole: object_r
     setype: bin_t
+  loop:
+    - 'named-editzone'
+    - 'named-healthy-check'
   tags:
     - bind_setupe
 
