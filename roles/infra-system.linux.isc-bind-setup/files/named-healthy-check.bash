@@ -18,7 +18,6 @@ function print_usage_short {
 if  [[ $1 == "\-h" ]] ; then
     print_usage_short
     exit 1
-    fi
 fi
 
 function print_usage {
@@ -67,16 +66,21 @@ function panic {
   exit ${error_code}
 }
 
+echo -e ""
+echo -e "Service: named.service is \e[1;33m${ENABLENOCROOT^^}\e[0;39m \n"
+echo -e "Service: named-chroot.service is \e[1;33m${ENABLECHOOT^^}\e[0;39m \n"
+
 pad "Check BIND service is active:"
 function binding {
-	for SERV in {$CHROOT,$NOCHROOT}
-	do
-	systemctl is-active $SERV > /dev/null && BIND="$SERV" && return 0
-	done
-	print_INVALID
-	return 1
+        for SERV in {$CHROOT,$NOCHROOT}
+        do
+        systemctl is-active $SERV && return 0
+        done
+        return 1
 }
+binding > /dev/null 2>&1
 if [ $? -ne 0 ]; then
+    print_INVALID
     exit 1
 else
     print_PASS
@@ -100,6 +104,12 @@ else
     print_PASS
 fi
 
+echo "Last logs:"
+
+for SERV in {$CHROOT,$NOCHROOT}
+do
+systemctl is-active $SERV > /dev/null && BIND="$SERV" && return 0
+done
 journalctl -xe _COMM=systemd -u ${BIND} -n 25 --no-pager
 
 exit 0
