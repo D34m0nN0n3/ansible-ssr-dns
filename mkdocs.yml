@@ -15,6 +15,7 @@ nav:
       - resolv.conf: 'roles/dns_client.md'
       - dnsmasq: 'roles/dnsmasq.md'
     - Структура git репозитория с предыдущей конфигурацией: 'git_last_conf.md'
+    - Инструкция сменного персонала: 'attendants.md'
     - Дополнительные материалы: 'seealso.md'
 
 plugins:

@@ -81,6 +81,7 @@ function binding {
 binding > /dev/null 2>&1
 if [ $? -ne 0 ]; then
     print_INVALID
+    echo -e "Last logs: " && journalctl -xe _COMM=systemd -n 7 --no-pager
     exit 1
 else
     print_PASS
@@ -104,12 +105,20 @@ else
     print_PASS
 fi
 
-echo "Last logs:"
+function loger {
+        for SERV in {$CHROOT,$NOCHROOT}
+        do
+        systemctl is-active $SERV > /dev/null && BIND="$SERV" && return 0
+        done
+        echo Error! No service is active.
+        return 1
+}
 
-for SERV in {$CHROOT,$NOCHROOT}
-do
-systemctl is-active $SERV > /dev/null && BIND="$SERV" && return 0
-done
-journalctl -xe _COMM=systemd -u ${BIND} -n 25 --no-pager
+loger
+if [ $? -ne 0 ]; then
+    exit 1
+else
+    echo -e "Last logs: " && journalctl -xe _COMM=systemd -u ${BIND} -n 7 --no-pager
+fi
 
 exit 0

@@ -105,26 +105,6 @@ echo "Editing $FILE..."
 vim -c ":set tabstop=8" -c ":set shiftwidth=8" -c ":set noexpandtab" ${FILE}.${DATE}.bak
 echo -e "\t\t[OK]"
 echo ""
-# Check to make sure the syntax is correct before continuing.
-pad "Syntax check:"
-named-checkzone $DOMAIN ${FILE}.${DATE}.bak > /dev/null 2>&1
-if [ $? -ne 0 ]; then 
-    print_INVALID
-    exit 1
-else
-    print_PASS
-fi
-# Continue to automatic functionality.
-read -p "Ready to commit? " choice
-    while :
-      do
-        case "$choice" in
-            y|Y) break;;
-            n|N) echo "Changes will not be automatically committed, exiting."; exit;;
-            * ) read -p "Please enter 'y' or 'n': " choice;;
-          esac
-      done
-echo ""
 # Force decimal representation, increment.
 if [ "${SERNUM}" -lt "${DATE}00" ]; then
     SERNEW="${DATE}01"
@@ -156,9 +136,18 @@ if [ $? -ne 0 ]; then
     exit 1
 else
     print_PASS
-    mv ${FILE}.tmp ${FILE} && mv ${FILE}.${DATE}.bak /tmp/${FILE}.${DATE};
 fi
-
+# Continue to automatic functionality.
+read -p "Ready to commit? " choice
+    while :
+      do
+        case "$choice" in
+            y|Y) mv ${FILE}.tmp ${FILE} && mv ${FILE}.${DATE}.bak /tmp/${FILE}.${DATE}; break;;
+            n|N) echo "Changes will not be automatically committed, exiting."; exit;;
+            * ) read -p "Please enter 'y' or 'n': " choice;;
+          esac
+      done
+echo ""
 # Restart BIND 
 pad "Restarting BIND:"
 function binding {
