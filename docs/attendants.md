@@ -43,19 +43,19 @@
 
 Для проверки используется программа `nslookup`, в качестве аргументов необходимо передать: тип запроса, разрешаемое имя, сервер системы имен (DNS). Перед началом проверки необходимо сбросить DNS кеш на клиенте, выполнив команду:
 
-!!! example inline Для Windows
+!!! example inline "Для Windows"
     ``` console
     ipconfig \flushdns
     ```
 
-!!! example inline end Для Linux
+!!! example inline end "Для Linux"
     ``` console
     sudo systemctl restart nscd.service
     ```
 
 Выполнить разрешение имен:
 
-!!! example Разрешения имен
+!!! example "Разрешения имен"
     ``` console
     nslookup -type=any <имя_записи> <ip_сервера>
     ```
