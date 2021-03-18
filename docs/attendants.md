@@ -153,4 +153,4 @@
 ## Необходимые права sudoers
 
 !!! done
-    Cmnd_Alias SERVICES = /usr/bin/systemctl (start|restart|status) (named|named-chroot).service, /usr/sbin/rndc (status|flus|reload)
+    Cmnd_Alias SERVICES = /usr/bin/systemctl (start|restart|status) (named|named-chroot).service, /usr/sbin/rndc (status|flus|reload), /usr/sbin/sosreport
