@@ -232,6 +232,19 @@
       loop:
         - node_exporter.service
         - bind_exporter.service
+  always:
+    - name: Create a directory for the dropdown file with additional content
+      file:
+        path: /etc/systemd/system/node_exporter.service.d
+        state: directory
+
+    - name: Add env options service
+      template:
+        src: node_exporter.env.j2
+        dest: /etc/systemd/system/node_exporter.service.d/node_exporter.env
+        owner: root
+        group: root
+        mode: '0600'
 
     - name: Start and enable service node_exporter & bind_exporter
       service:
@@ -242,7 +255,6 @@
       loop:
         - node_exporter.service
         - bind_exporter.service
-
   tags:
     - bind_setupe
     - bind_exporter_prometheus
