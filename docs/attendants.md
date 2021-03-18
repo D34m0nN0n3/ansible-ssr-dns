@@ -4,8 +4,16 @@
     1. [Общее описание](#общее-описание)
     2. [Диагностика](#проверка-работоспособности)
     3. [Устранение сбоя](#устранение-сбоя)
+    4. [Необходимые права sudoers](#необходимые-права-sudoers)
 
 ## Общее описание
+
+Сбои разделены на два типа операционные ошибки и ошибки конфигурации.
+
+* Операционные ошибки - возникают в процессе выполнения различных операций, таких как формирование "негативного кеша". Устраняются без привлечения администратора.
+* Ошибки конфигурации - связаны с неправильным внесением изменений в конфигурационные файлы. Устраняются с привлечением администратора.
+
+Ниже приведено описание нахождения и устранения сбоев.
 
 ## Проверка работоспособности
 
@@ -124,12 +132,25 @@
 
 !!! example "Запуск"
     ``` console
-    sudo systemctl start <unit_name> && sudo systemctl status <unit_name> -l
+    sudo systemctl start <unit_name> && sudo systemctl status <unit_name>
     ```
 
 !!! example "Перезапуск"
     ``` console
-    sudo systemctl restart <unit_name> && sudo systemctl status <unit_name> -l
+    sudo systemctl restart <unit_name> && sudo systemctl status <unit_name>
     ```
 
-'-- The start-up result is done.' '-- The result is failed.'
+Проверить журнал на наличие ошибок:
+
+!!! example
+    ``` console
+    journalctl -xe _COMM=systemd -u <unit_name> -n 3 --no-pager
+    ```
+
+Если вывод заканчивается строкой: '-- The start-up result is done.', выполнить [разрешение имен](#3-проверка-разрешения-имен).
+Если вывод заканчивается стракой: '-- The result is failed.', запустить [сбор диагностической информации](#4-сбор-диагностической-информации) и сообщить об этом ответственным администраторам.
+
+## Необходимые права sudoers
+
+!!! done
+    'Cmnd_Alias SERVICES = /usr/bin/systemctl (start|restart|status) (named|named-chroot).service, /usr/sbin/rndc (status|flus|reload)'
