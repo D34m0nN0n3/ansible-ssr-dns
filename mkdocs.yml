@@ -22,6 +22,9 @@ nav:
 plugins:
     - search
     - git-revision-date-localized
+    - git-revision-date
+        enabled_if_env: CI
+    - macros
     - pdf-export:
         verbose: true
         media_type: print
