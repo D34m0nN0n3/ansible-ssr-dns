@@ -3,7 +3,7 @@ acl "authorized_networks" { localhost; localnets; {% if auth_nets is defined %}{
 
 acl "trusted_clients" { localhost; {% if trust_clients is defined %}{{ trust_clients | join('; ') }}; {% endif %}};
 {% if bind_list_ipv4_static is defined %}
-acl "trusted_servers" { localhost; {% for acl_ts in bind_list_ipv4_static %}{{  | join('; ') }} {% endfor %}{%  if bind_list_ipv6_static is defined %}{%  for acl_ts in bind_list_ipv6_static %}{{  | join('; ') }} {%  endfor %}{%  endif %}};
+acl "trusted_servers" { localhost; {% for acl_ts_4 in bind_list_ipv4_static %}{{ acl_ts_4 | join('; ') }} {% endfor %}{%  if bind_list_ipv6_static is defined %}{%  for acl_ts_6 in bind_list_ipv6_static %}{{ acl_ts_6 | join('; ') }} {%  endfor %}{%  endif %}};
 {% elif %}
 acl "trusted_servers" { localhost; {% if trust_servers is defined %}{{ trust_servers | join('; ') }}; {% endif %}{%  for acl_ts in trust_servers_dynamic %}{%   if acl_ts is string or acl_ts is iterable %}{{ macros.listify(acl_ts) }} {%   elif acl_ts is mapping %}{{ macros.listify(acl_ts) }} {%   endif %}{%  endfor %}};
 {% endif %}
