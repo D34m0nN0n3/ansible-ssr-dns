@@ -30,7 +30,7 @@
       when: (bind_srv_role is defined and bind_srv_role == 'slave') or
             ('slaves' in groups and groups['slaves']) and inventory_hostname in groups['slaves']
 
-- name: Create facts
+- name: Create dynamic facts
   block:
     - name: Get all IPv4 for trust_servers ACL
       set_fact:
@@ -49,6 +49,24 @@
     - name: Get slaves IP
       set_fact:
         ip_slaves: "{% for host in groups['dynamic_group_slaves'] %}{{ hostvars[host]['ansible_default_ipv4'].address }}{% if not loop.last %},{% endif %}{% endfor %}"
+
+- name: Create facts
+  block:
+    - name: Create IPv4 listen for trust_servers ACL
+      set_fact:
+        bind_list_ipv4_static: "{% for host in groups['all'] %}{{ hostvars[host]['bind_listen_ipv4'] }}{% if not loop.last %},{% endif %}{% endfor %}"
+        cacheable: no
+
+    - name: Create IPv6 listen for trust_servers ACL
+      set_fact:
+        bind_list_ipv6_static: "{% for host in groups['all'] %}{{ hostvars[host]['bind_listen_ipv6'] }}{% if not loop.last %},{% endif %}{% endfor %}"
+        cacheable: no
+
+    - name: Get all hostname for NS RR
+      set_fact:
+        hostname_fqdn_static: "{% for host in groups['all'] %}{{ hostvars[host]['bind_fqdn'] }}{% if not loop.last %},{% endif %}{% endfor %}"
+        cacheable: no
+  when: (bind_listen_ipv4 is defined or bind_listen_ipv6 is defined) and bind_ns_rr_list is defined
 
 - name: Check IPv6
   block:
@@ -159,20 +177,21 @@
     - bind_configure
     - bind_copy_configs
 
-- name: Create RPZ zones
-  block:
-    - name: Copy RPZ zone policy
-      template:
-        src: 'rpz.{{ item }}.j2'
-        dest: '/var/named/rpz.{{ item }}'
-        owner: root
-        group: named
-        mode: "0650"
-        setype: named_cache_t
-      loop:
-        - passeddomain.hosts
-        - changeddomain.hosts
-        - blockeddomain.hosts
+
+- name: Copy RPZ zone policy
+  template:
+    src: 'rpz.{{ item }}.j2'
+    dest: '/var/named/rpz.{{ item }}'
+    owner: root
+    group: named
+    mode: "0650"
+    setype: named_cache_t
+  loop:
+    - passeddomain.hosts
+    - changeddomain.hosts
+    - blockeddomain.hosts
+  when: (bind_srv_role is defined and bind_srv_role == 'master') or
+        ('master' in groups and groups['master']) and inventory_hostname in groups['master']
   tags:
     - bind_configure
     - bind_copy_configs

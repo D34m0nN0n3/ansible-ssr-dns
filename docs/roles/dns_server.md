@@ -68,6 +68,10 @@ Domain name server — приложение, предназначенное дл
 |bind_restore_last_conf            | boolean        | def in var (false)                   | Задает нужно ли восстановить предыдущую конфигурацию.                                     |
 |remote_git_repo                   | string         | undef                                | Репозиторий от куда загружать предыдущую конфигурацию.                                    |
 |local_git_repo                    | string         | def in var (/var/tmp/isc-bind-files) | Куда временно сохранить предыдущую конфигурацию.                                          |
+|bind_listen_ipv4                  | array          | undef                                |  |
+|bind_listen_ipv6                  | array          | undef                                |  |
+|bind_fqdn                         | string         | undef                                |  |
+
 
 ## Теги
 |Тег                       | Описание                            |
