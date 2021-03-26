@@ -1,9 +1,9 @@
-hostname                     "{% if bind_fqdn is defined %}{{ bind_fqdn }}{% elsif %}{{ ansible_fqdn }}{% endif %}";
+hostname                     "{% if bind_fqdn is defined %}{{ bind_fqdn }}{% else %}{{ ansible_fqdn }}{% endif %}";
 version                      "Unknown";
 server-id                    "Administrators contact: ph. {{ bind_cont_ph_num }}, e-mail {{ bind_cont_mail }}";
-listen-on port 53            { 127.0.0.1; {% if bind_listen_ipv4 is defined %}{{ bind_listen_ipv4 }}{% elif %}{{ ansible_all_ipv4_addresses | join('; ') }}{% endif %}; };
+listen-on port 53            { 127.0.0.1; {% if bind_listen_ipv4 is defined %}{{ bind_listen_ipv4 }}{% else %}{{ ansible_all_ipv4_addresses | join('; ') }}{% endif %}; };
 {% if bind_ip_v6_on is sameas true -%}
-listen-on-v6 port 53         { ::1; {% if bind_listen_ipv6 is defined %}{{ bind_listen_ipv6 }}{% elif %}{{ ansible_all_ipv6_addresses | join('; ') }}{% endif %}; };
+listen-on-v6 port 53         { ::1; {% if bind_listen_ipv6 is defined %}{{ bind_listen_ipv6 }}{% else %}{{ ansible_all_ipv6_addresses | join('; ') }}{% endif %}; };
 {% else -%}
 listen-on-v6 port 53         { none; };
 {% endif -%}
@@ -24,11 +24,11 @@ allow-transfer               { none; };
 allow-update                 { none; };
 allow-query-on               { none; };
 allow-query-cache-on         { none; };
-query-source                 address {% if bind_listen_ipv4 is defined %}{{ bind_listen_ipv4 }}{% elif %}{{ ansible_default_ipv4.address }}{% endif %} port *;
+query-source                 address {% if bind_listen_ipv4 is defined %}{{ bind_listen_ipv4 }}{% else %}{{ ansible_default_ipv4.address }}{% endif %} port *;
 {% if bind_ip_v6_on is sameas true -%}
-query-source-v6              address {% if bind_listen_ipv6 is defined %}{{ bind_listen_ipv6 }}{% elif %}{{ ansible_default_ipv6.address }}{% endif %} port *;
+query-source-v6              address {% if bind_listen_ipv6 is defined %}{{ bind_listen_ipv6 }}{% else %}{{ ansible_default_ipv6.address }}{% endif %} port *;
 {% endif -%}
-transfer-source              {% if bind_listen_ipv4 is defined %}{{ bind_listen_ipv4 }}{% elif %}{{ ansible_default_ipv4.address }}{% endif %} port 53;
+transfer-source              {% if bind_listen_ipv4 is defined %}{{ bind_listen_ipv4 }}{% else %}{{ ansible_default_ipv4.address }}{% endif %} port 53;
 {% if alt_tranfer_src is defined and alt_tranfer_src is sameas true -%}
 {%  if alt_tranfer_addr is defined -%}
 alt-transfer-source          {{ alt_tranfer_addr }} port 53;

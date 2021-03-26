@@ -1,7 +1,7 @@
 {%- import '_macros.j2' as macros with context -%}
 acl "authorized_networks" { localhost; localnets; {% if auth_nets is defined %}{{ auth_nets | join('; ') }}; {% else %}any; {% endif %}};
 
-acl "trusted_clients" { localhost; {% if trust_clients is defined %}{{ trust_clients | join('; ') }}; {% endif %}};
+acl "trusted_clients" { localnets; {% if trust_clients is defined %}{{ trust_clients | join('; ') }}; {% endif %}};
 {%   if bind_list_ipv4_static is defined %}
 acl "trusted_servers" { localhost; {% for acl_ts_4 in bind_list_ipv4_static %}{{ acl_ts_4 | join('; ') }} {% endfor %}{%  if bind_list_ipv6_static is defined %}{%  for acl_ts_6 in bind_list_ipv6_static %}{{ acl_ts_6 | join('; ') }} {%  endfor %}{%  endif %}};
 {%   else %}
