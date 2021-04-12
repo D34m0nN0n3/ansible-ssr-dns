@@ -1,6 +1,6 @@
 {% set list_ns = hostname_fqdn_dynamic.split(',') %}
 $TTL   86400 ; 1 day
-@       IN      SOA     {{ ansible_fqdn }}. postmaster.{{ ansible_domain }} (
+@       IN      SOA     {% if bind_fqdn is defined %}{{ bind_fqdn }}{% else %}{{ ansible_fqdn }}{% endif %}. postmaster.{{ ansible_domain }} (
                           {{ lookup('pipe','date +%Y%m%d') + ('00') }}
                           28800   ; refresh  8 hours
                           7200    ; retry    2 hours
