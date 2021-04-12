@@ -11,12 +11,12 @@ $TTL   86400 ; 1 day
 {%  if bind_fqdn is defined %}
 {% for in_ns in slist_ns %}
                           IN  NS     {{ in_ns }}.
-{%- endfor %}
+{% endfor %}
 {%  else %}
 {% for in_ns in dlist_ns %}
                           IN  NS     {{ in_ns }}.
-{%- endfor %}
-{%  endif %}
+{% endfor %}
+{%-  endif %}
 
 ; QNAME policy records.
 ; (.) - возврат NXDOMAIN
