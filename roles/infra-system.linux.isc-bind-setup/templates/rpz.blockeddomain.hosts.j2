@@ -1,4 +1,5 @@
-{% set list_ns = hostname_fqdn_dynamic.split(',') %}
+{% set dlist_ns = hostname_fqdn_dynamic.split(',') %}
+{% set slist_ns = hostname_fqdn_static.split(',') %}
 $TTL   86400 ; 1 day
 @       IN      SOA     {% if bind_fqdn is defined %}{{ bind_fqdn }}{% else %}{{ ansible_fqdn }}{% endif %}. postmaster.{{ ansible_domain }} (
                           {{ lookup('pipe','date +%Y%m%d') + ('00') }}
@@ -7,10 +8,15 @@ $TTL   86400 ; 1 day
                           864000  ; expire  10 days
                           86400 ) ; min ttl  1 day
 
-{% for in_ns in list_ns %}	
+{%  if bind_fqdn is defined %}
+{% for in_ns in slist_ns %}
                           IN  NS     {{ in_ns }}.
 {%- endfor %}
-
+{%  else %}
+{% for in_ns in dlist_ns %}
+                          IN  NS     {{ in_ns }}.
+{%- endfor %}
+{%  endif %}
 
 ; QNAME policy records.
 ; (.) - возврат NXDOMAIN
