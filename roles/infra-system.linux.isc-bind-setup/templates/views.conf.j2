@@ -45,13 +45,13 @@ view "internal" {
                         };
 
 zone "rpz.passeddomain.hosts" IN {
-{%   if ansible_fqdn in groups['dynamic_group_master'] %}
+{%   if inventory_hostname in groups['dynamic_group_master'] %}
       type master;
 {%   else %}
       type slave;
 {%   endif %}
       file "/var/named/rpz.passeddomain.hosts";
-{%   if ansible_fqdn in groups['dynamic_group_master'] %}
+{%   if inventory_hostname in groups['dynamic_group_master'] %}
       allow-transfer { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
       also-notify { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
       allow-update { none; };
@@ -63,13 +63,13 @@ zone "rpz.passeddomain.hosts" IN {
       };
 
 zone "rpz.changeddomain.hosts" IN {
-{%   if ansible_fqdn in groups['dynamic_group_master'] %}
+{%   if inventory_hostname in groups['dynamic_group_master'] %}
       type master;
 {%   else %}
       type slave;
 {%   endif %}
       file "/var/named/rpz.changeddomain.hosts";
-{%   if ansible_fqdn in groups['dynamic_group_master'] %}
+{%   if inventory_hostname in groups['dynamic_group_master'] %}
       allow-transfer { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
       also-notify { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
       allow-update { none; };
@@ -81,13 +81,13 @@ zone "rpz.changeddomain.hosts" IN {
       };
 
 zone "rpz.blockeddomain.hosts" IN {
-{%   if ansible_fqdn in groups['dynamic_group_master'] %}
+{%   if inventory_hostname in groups['dynamic_group_master'] %}
       type master;
 {%   else %}
       type slave;
 {%   endif %}
       file "/var/named/rpz.blockeddomain.hosts";
-{%   if ansible_fqdn in groups['dynamic_group_master'] %}
+{%   if inventory_hostname in groups['dynamic_group_master'] %}
       allow-transfer { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
       also-notify { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
       allow-update { none; };
