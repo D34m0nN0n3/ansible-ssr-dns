@@ -70,6 +70,12 @@
         cacheable: no
       when: bind_fqdn is defined
 
+- debug:
+    var: bind_list_ipv4_static
+
+- debug:
+    var: hostname_fqdn_static
+
 - name: Check IPv6
   block:
     - name: Check if IPv6 disabled at grub command line
