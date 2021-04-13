@@ -24,9 +24,9 @@ allow-transfer               { none; };
 allow-update                 { none; };
 allow-query-on               { none; };
 allow-query-cache-on         { none; };
-query-source                 {% if bind_listen_ipv4 is defined %}{{ bind_listen_ipv4 }}{% else %}{{ ansible_default_ipv4.address }}{% endif %} port *;
+query-source                 address {% if bind_listen_ipv4 is defined %}{{ bind_listen_ipv4 }}{% else %}{{ ansible_default_ipv4.address }}{% endif %} port *;
 {% if bind_ip_v6_on is sameas true -%}
-query-source-v6              {% if bind_listen_ipv6 is defined %}{{ bind_listen_ipv6 }}{% else %}{{ ansible_default_ipv6.address }}{% endif %} port *;
+query-source-v6              address {% if bind_listen_ipv6 is defined %}{{ bind_listen_ipv6 }}{% else %}{{ ansible_default_ipv6.address }}{% endif %} port *;
 {% endif -%}
 transfer-source              {% if bind_listen_ipv4 is defined %}{{ bind_listen_ipv4 }}{% else %}{{ ansible_default_ipv4.address }}{% endif %} port 53;
 {% if alt_tranfer_src is defined and alt_tranfer_src is sameas true -%}
