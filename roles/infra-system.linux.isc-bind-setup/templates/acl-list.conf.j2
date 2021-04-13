@@ -1,6 +1,10 @@
 {%- import '_macros.j2' as macros with context -%}
+{% if bind_list_ipv4_static is defined %}
 {% set list_ip4 = bind_list_ipv4_static.split(',') %}
+{% endif -%}
+{% if bind_list_ipv6_static is defined %}
 {% set list_ip6 = bind_list_ipv6_static.split(',') %}
+{% endif -%}
 acl "authorized_networks" { localhost; localnets; {% if auth_nets is defined %}{{ auth_nets | join('; ') }}; {% else %}any; {% endif %}};
 
 acl "trusted_clients" { localnets; {% if trust_clients is defined %}{{ trust_clients | join('; ') }}; {% endif %}};
