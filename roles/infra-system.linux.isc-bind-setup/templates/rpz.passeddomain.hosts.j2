@@ -1,5 +1,9 @@
-{% set list_ns = hostname_fqdn_dynamic.split(',') %}
+{% if hostname_fqdn_dynamic is defined %}
+{% set dlist_ns = hostname_fqdn_dynamic.split(',') %}
+{% endif -%}
+{% if hostname_fqdn_static is defined %}
 {% set slist_ns = hostname_fqdn_static.split(',') %}
+{% endif -%}
 $TTL   86400 ; 1 day
 @       IN      SOA     {% if bind_fqdn is defined %}{{ bind_fqdn }}{% else %}{{ ansible_fqdn }}{% endif %}. postmaster.{{ ansible_domain }} (
                           {{ lookup('pipe','date +%Y%m%d') + ('00') }}
