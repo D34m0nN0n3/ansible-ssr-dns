@@ -108,10 +108,15 @@ fi
 [[ ! -f ${FILE}.${DATE}.bak ]] && panic 1 "${FILE}.${DATE}.bak does not exist"
 
 # Run VIM in sudo to open the file.
-echo "Editing $FILE..."
 vim -c ":set tabstop=8" -c ":set shiftwidth=8" -c ":set noexpandtab" ${FILE}.${DATE}.bak
-echo -e "\t\t[OK]"
 echo ""
+pad "Editing $FILE"
+if [ $? -ne 0 ]; then
+    print_FAIL
+    exit 1
+else
+    print_SUCCESS
+fi
 
 # Force decimal representation, increment.
 if [ "${SERNUM}" -lt "${DATE}00" ]; then
@@ -169,7 +174,7 @@ read -p "Ready to commit? " choice
       do
         case "$choice" in
             y|Y) data_MODIF; break;;
-            n|N) echo "Changes will not be automatically committed, exiting."; exit;;
+            n|N) echo -e "\nChanges will not be automatically committed, exiting."; exit;;
             * ) read -p "Please enter 'y' or 'n': " choice;;
           esac
       done
