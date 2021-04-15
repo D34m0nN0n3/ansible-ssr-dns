@@ -20,6 +20,22 @@
       tags:
         - bind_restore_from_git
 
+  rescue:
+    - name: Cleanup old git dir
+      file:
+        path: {{ local_git_repo }}
+        state: absent
+
+    - name: Rerun clone repo
+      git:
+        repo: "{{ remote_git_repo }}"
+        dest: "{{ local_git_repo }}"
+        force: yes
+      delegate_to: 127.0.0.1
+      become: false
+      run_once: true
+
+  always:
     - name: Temp zones config
       set_fact:
         named_zones: "{{ lookup('file', '{{ local_git_repo }}/named.zones') }}"
