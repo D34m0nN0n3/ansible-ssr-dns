@@ -15,13 +15,20 @@ fi
 MINARG=2
 
 function print_usage_short {
-    echo "Get help: $0 for help (-h | --help)"
+    echo "Get help: \"$0 <domain> <file zone>\" or for more information (-h | --help)"
 }
 
 function print_usage {
 cat <<EOF
-Use this script: $0 <domain> <file zone>
-The script automatically changes the serial number of the zone and creates a backup copy in the "/tmp" directory. <file name>.<current date>
+Use this script:\"$0 <domain> <file zone>\"
+The script support text and raw format zone file.
+The script automatically changes the serial number of the zone and creates a backup copy in the "/tmp" directory <file name>.<current date>
+
+For manual convert format zone file:
+Convert raw zone file "example.net.raw", containing data for zone example.net, to text-format zone file "example.net.text": 
+$ named-compilezone -f raw -F text -o example.net.text example.net example.net.raw
+Convert text format zone file "example.net.text", containing data for zone example.net, to raw zone file "example.net.raw": 
+$ named-compilezone -f text -F raw -o example.net.raw example.net example.net.text
 EOF
 }
 
@@ -147,7 +154,8 @@ function data_MODIF {
   else
   mv ${FILE}.tmp ${FILE}
     if [[ "${FILE}" =~ ^/* ]]; then
-    mv ${FILE}.${DATE}.bak /tmp${FILE}.${DATE}
+    FILE=$(echo ${FILE} | grep -o -hE "[-.a-z0-9]*$")
+    mv ${FILE}.${DATE}.bak /tmp/${FILE}.${DATE}
     else
     mv ${FILE}.${DATE}.bak /tmp/${FILE}.${DATE}
     fi
