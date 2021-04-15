@@ -20,7 +20,7 @@ function print_usage_short {
 
 function print_usage {
 cat <<EOF
-Use this script:\"$0 <domain> <file zone>\"
+Use this script:"$0 <domain> <file zone>"
 The script support text and raw format zone file.
 The script automatically changes the serial number of the zone and creates a backup copy in the "/tmp" directory <file name>.<current date>
 
@@ -32,7 +32,7 @@ $ named-compilezone -f text -F raw -o example.net.raw example.net example.net.te
 EOF
 }
 
-if  [[ $1 == "\-h" ]] || [[ $1 == "\-\-h" ]]; then
+if  [[ $1 == "-h" ]] || [[ $1 == "--help" ]]; then
     print_usage
     exit 1
     else
@@ -156,8 +156,8 @@ function data_MODIF {
   mv ${FILE}.tmp ${FILE}
   chown :named ${FILE}
     if [[ "${FILE}" =~ ^/* ]]; then
-    FILE=$(echo ${FILE} | grep -o -hE "[-.a-z0-9]*$")
-    mv ${FILE}.${DATE}.bak /tmp/${FILE}.${DATE}
+    MFILE=$(echo ${FILE} | grep -o -hE "[-.a-z0-9]*$")
+    mv ${FILE}.${DATE}.bak /tmp/${MFILE}.${DATE}
     else
     mv ${FILE}.${DATE}.bak /tmp/${FILE}.${DATE}
     fi
