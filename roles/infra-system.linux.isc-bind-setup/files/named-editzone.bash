@@ -151,8 +151,10 @@ fi
 function data_MODIF {
   if [[ ZCONV == "True" ]] ; then
   named-compilezone -f text -F raw -o ${FILE}.tmp ${DOMAIN} ${FILE} > /dev/null 2>&1
+  chown :named ${FILE}
   else
   mv ${FILE}.tmp ${FILE}
+  chown :named ${FILE}
     if [[ "${FILE}" =~ ^/* ]]; then
     FILE=$(echo ${FILE} | grep -o -hE "[-.a-z0-9]*$")
     mv ${FILE}.${DATE}.bak /tmp/${FILE}.${DATE}
