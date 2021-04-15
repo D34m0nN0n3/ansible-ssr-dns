@@ -15,30 +15,24 @@ fi
 MINARG=2
 
 function print_usage_short {
-    echo "Get help: \"$0\" for help (-h | --help)"
+    echo "Get help: $0 for help (-h | --help)"
 }
 
-if  [[ $1 == "\-h" ]] ; then
-    print_usage_short
+function print_usage {
+cat <<EOF
+Use this script: $0 <domain> <file zone>
+The script automatically changes the serial number of the zone and creates a backup copy in the "/tmp" directory. <file name>.<current date>
+EOF
+}
+
+if  [[ $1 == "\-h" ]] || [[ $1 == "\-\-h" ]]; then
+    print_usage
     exit 1
     else
     if [ $# -lt "$MINARG" ] ; then
     print_usage_short
     exit 1
     fi
-fi
-
-function print_usage {
-cat <<EOF
-Use this script: \"$0\" <domain> <file zone>
-
-
-EOF
-}
-
-if  [[ $1 == "\-\-h" ]] ; then
-    print_usage
-    exit 1
 fi
 
 PACKAGES=( bash )
@@ -151,7 +145,12 @@ function data_MODIF {
   if [[ ZCONV == "True" ]] ; then
   named-compilezone -f text -F raw -o ${FILE}.tmp ${DOMAIN} ${FILE} > /dev/null 2>&1
   else
-  mv ${FILE}.tmp ${FILE} && mv ${FILE}.${DATE}.bak /tmp/${FILE}.${DATE}
+  mv ${FILE}.tmp ${FILE}
+    if [[ "${FILE}" =~ ^/* ]]; then
+    mv ${FILE}.${DATE}.bak /tmp${FILE}.${DATE}
+    else
+    mv ${FILE}.${DATE}.bak /tmp/${FILE}.${DATE}
+    fi
   fi
 }
 
