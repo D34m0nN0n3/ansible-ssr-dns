@@ -23,7 +23,7 @@
   rescue:
     - name: Cleanup old git dir
       file:
-        path: {{ local_git_repo }}
+        path: "{{ local_git_repo }}"
         state: absent
 
     - name: Rerun clone repo
