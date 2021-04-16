@@ -152,9 +152,17 @@ else
     print_PASS
 fi
 
+# Create temp dir and cleaanup old files
+if [ ! -d /tmp/named_zone ]; then
+  mkdir -p /tmp/named_zone
+fi
+
+# Remuve backup file 30 day old.
+find /tmp/named_zone/ -type f -mtime +30 -exec rm -f {} \; &>/dev/null
+
 # Continue to automatic functionality.
 function data_MODIF {
-  if [[ ZCONV == "True" ]] ; then
+  if [[ ZCONV == "True" ]]; then
   named-compilezone -f text -F raw -o ${FILE}.tmp ${DOMAIN} ${FILE} > /dev/null 2>&1
   chown :named ${FILE}
   else
@@ -162,9 +170,9 @@ function data_MODIF {
   chown :named ${FILE}
     if [[ "${FILE}" =~ ^/* ]]; then
     MFILE=$(echo ${FILE} | grep -o -hE "[-.a-z0-9]*$")
-    mv ${FILE}.${DATE}.bak /tmp/${MFILE}.${DATE}
+    mv ${FILE}.${DATE}.bak /tmp/named_zone/${MFILE}.${DATE}
     else
-    mv ${FILE}.${DATE}.bak /tmp/${FILE}.${DATE}
+    mv ${FILE}.${DATE}.bak /tmp/named_zone/${FILE}.${DATE}
     fi
   fi
 }
