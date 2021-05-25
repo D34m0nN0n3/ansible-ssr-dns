@@ -1,0 +1,83 @@
+---
+- name: Create data fact
+  set_fact:
+    report_date: "{{ '%Y-%m-%d' | strftime }}"
+  delegate_to: localhost
+  run_once: true
+
+- name: Create random number
+  set_fact:
+    random_num: "{{ lookup('password', '/dev/null chars=hexdigits length=6') }}"
+    cacheable: no
+  delegate_to: localhost
+  run_once: true
+
+- name: Create recipient mail address
+  set_fact:
+    admin_mail_rcpt: bind_cont_mail
+  when: mail_rcpt_to is undefined and bind_cont_mail is defined
+
+- name: Create sender mail address
+  set_fact:
+    mail_from: "no-reply@{{ ansible_domain }}"
+    cacheable: no
+  when: mail_from is undefined
+
+- name: Create temp path for report
+  set_fact:
+    report_html: "{{ playbook_dir }}/Report_updates_{{ report_date }}_{{ random_num }}.html"
+    cacheable: no
+
+- name: Check service facts
+  service_facts: 
+
+- name: Check load zones
+  shell: rndc status
+  register: load_zones_output
+  ignore_errors: true
+
+- name: Create fact for host role Master
+  set_fact:
+    master: True
+  when: (bind_srv_role is defined and bind_srv_role == 'master') or
+        ('master' in groups and groups['master']) and inventory_hostname in groups['master']
+
+- name: Create fact for host role Slave
+  set_fact:
+    slave: True
+  when: (bind_srv_role is defined and bind_srv_role == 'slave') or
+        ('slaves' in groups and groups['slaves']) and inventory_hostname in groups['slaves']
+
+- name: Host not complite
+  fail:
+    msg: >
+         "Check configs: {{ check_conf_result }}"
+         "Check zones: {{ check_zones_result }}"
+  when: check_conf_result.rc != 0 or check_zones_result.rc != 0
+
+- name: Create reports
+  template:
+    src: includes/report/report.j2
+    dest: "{{ report_html }}"
+  delegate_to: localhost
+  run_once: true
+
+- name: Send mail report
+  mail:
+    host: "{{ mail_host | default(omit) }}"
+    port: "{{ mail_port | default('25') }}"
+    from: "{{ mail_from | default(omit) }}"
+    to: "{{ admin_mail_rcpt | default(omit) }}"
+    subtype: html
+    charset: utf8
+    subject: System update report {{ report_date }}
+    body: "{{ lookup('file', report_html) }}"
+  delegate_to: localhost
+  run_once: true
+  when: mail_host is defined and mail_port is defined and mail_from is defined and admin_mail_rcpt is defined
+
+- name: Cleanup
+  file:
+    path: "{{ playbook_dir }}/Report_updates_{{ report_date }}_{{ random_num }}.html"
+    state: absent
+...

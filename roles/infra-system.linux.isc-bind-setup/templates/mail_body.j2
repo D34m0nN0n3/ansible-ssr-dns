@@ -1,8 +1,0 @@
-<div>
-<ul>
-{% for host in play_hosts %}
-<li>On&nbsp;the&nbsp;<span style="color: #333333;"><strong>&nbsp;{{ host }}&nbsp;</strong></span>,&nbsp;ISC&nbsp;BIND&nbsp;status:&nbsp;<span style="color: #333333;"><strong>&nbsp;{{ hostvars[host]['result']['state'] }}&nbsp;</strong></span></li>
-{% endfor %}
-</ul>
-<p>&nbsp;</p>
-</div>

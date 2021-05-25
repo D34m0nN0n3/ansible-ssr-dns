@@ -4,10 +4,12 @@
     - name: Check named.conf
       command: named-checkconf /etc/named.conf
       register: check_conf_result
+      ignore_errors: true
 
     - name: Check zones
       command: named-checkconf -z
       register: check_zones_result
+      ignore_errors: true
 
 - name: Check services exists
   block:
@@ -48,32 +50,4 @@
       register: result
       when: ansible_facts.services['node_exporter.service'] is defined
   when: (check_conf_result.rc == 0) and (check_zones_result.rc == 0)
-
-- name: Mail report
-  block:
-    - name: RCPT
-      set_fact: 
-        mail_rcpt_to: bind_cont_mail
-      when: mail_rcpt_to is undefined
-
-    - name: FROM
-      set_fact: 
-        mail_from: "ansible@{{ ansible_domain }}"
-        cacheable: no
-      when: mail_from is undefined
-
-    - name: Send mail report
-      mail:
-        host: "{{ mail_host }}"
-        port: "{{ mail_port | default('25') }}"
-        from: "{{ mail_from }}"
-        to: "{{ mail_rcpt_to }}"
-        subtype: html
-        subject: 'Ansible-report: ISC BIND setup.'
-        body: "{{ lookup('template', 'templates/mail_body.j2') }}"
-      delegate_to: 127.0.0.1
-      ignore_errors: yes
-      become: false
-      run_once: true
-  when: mail_host is defined
 ...

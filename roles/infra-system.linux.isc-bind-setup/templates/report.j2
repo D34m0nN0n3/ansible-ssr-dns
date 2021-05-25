@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <style>
+     {% include 'includes/bootstrap/bootstrap.min.css' %}
+  </style>
+  <style>
+     {% include 'includes/bootstrap/bootstrap-select.min.css' %}
+  </style>
+  <title>Report</title>
+  {% include 'includes/styles.j2' %}
+</head>
+<body>
+<div class="container">
+<table class="table table-striped table-hover table-sm table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th>Hostname</th>
+            <th>IP Address</th>
+            <th>Service status</th>
+            <th>Load zones</th>
+            <th>Status check error code</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for host in groups['all'] %}
+        <tr>
+            {% set master_role = hostvars[host]['master'] %}
+            {% set slave_role = hostvars[host]['slave'] %}
+            <td><span data-toggle="tooltip" data-placement="left" title="{% if master_role is defined and master_role is sameas true %}Role: master, {% endif %}{% if slave_role is defined and slave_role is sameas true %}Role: slave, {% endif %}Type: {{ hostvars[host]['bind_srv_type'] }}" class="badge badge-gray-dark">{{ hostvars[host]['ansible_fqdn'] }}</span></td>
+            <td><span data-toggle="tooltip" data-placement="left" class="badge badge-gray">{{ hostvars[host]['ansible_default_ipv4']['address'] }}</span></td>
+            <td>
+            {% set status = hostvars[host]['ansible_facts']['services']['named-chroot.service']['status'] %}
+            {% set state = hostvars[host]['ansible_facts']['services']['named-chroot.service']['state'] %}
+            {% if status == 'enabled' and state == 'running' %}
+            <span class="badge badge-pill badge-success">OK</span>
+            {% else %}
+            {%  if status != 'enabled' %}
+            <span class="badge badge-pill badge-danger">{{ status }}</span>
+            {%  endif %}
+            {%  if state != 'running' %}
+            <span class="badge badge-pill badge-danger">{{ state }}</span>
+            {%  endif %}
+            {% endif %}
+            </td>
+            <td>
+            {% set load_zones = hostvars[host]['load_zones_output']['stdout_lines'] %}
+            {% if load_zones[8] is defined %}
+            <span class="badge badge-pill badge-success">{{ load_zones[8] | regex_findall('\d+') | max }}</span>
+            {% else %}
+            <span class="badge badge-pill badge-info">NO</span>
+            {% endif %}
+            </td>
+        <td>
+            {% set conf_rc = hostvars[host]['check_conf_result']['rc'] %}
+            {% set zones_rc = hostvars[host]['check_zones_result']['rc'] %}
+            {% if conf_rc == 0 and zones_rc == 0 %}
+            <span title="Check configs and zones" class="badge badge-pill badge-success">PASS</span>
+            {% else %}
+            {%  if conf_rc != 0 %}
+            <span title="Check configs" class="badge badge-pill badge-danger">{{ conf_rc }}</span>
+            {%  endif %}
+            {%  if conf_rc == 0 and zones_rc != 0 %}
+            <span title="Check zones" class="badge badge-pill badge-danger">{{ zones_rc }}</span>
+            {%  endif %}
+            {% endif %}
+            </td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+</div>
+{% for host in groups['all'] %}
+{% set conf_rc = hostvars[host]['check_conf_result']['rc'] %}
+{% set zones_rc = hostvars[host]['check_zones_result']['rc'] %}
+{% if conf_rc != 0 or zones_rc != 0 %}
+<div class="container">
+        <div>
+            <hr>
+        <div>
+            <p style="text-align: center"><span data-toggle="tooltip" data-placement="left" title="Role: slave, Type: Mix" class="badge badge-gray-dark">Errors stdout from: {{ hostvars[host]['ansible_fqdn'] }}</span></p>
+        </div>
+            {%  if conf_rc != 0 %}
+            <b>> Check configs result</b>
+            <pre class="text-monospace">{{hostvars[host].check_conf_result.stdout}}</pre>
+            {%  endif %}
+            {%  if conf_rc == 0 and zones_rc != 0 %}
+            <b>> Check zones resuls</b>
+            <pre class="text-monospace">{{hostvars[host].check_zones_result.stdout}}</pre>
+            {%  endif %}
+            </div>
+        </div>
+</div>
+{% endif %}
+{% endfor %}
+<div class="container">
+        <div>
+            <hr>
+            <p style="text-align: center"><span data-toggle="tooltip" data-placement="left" class="badge badge-gray">Complite on host succesed: {% for host in play_hosts %}</span> <span class="badge badge-gray">{{ host }}</span>{% if not loop.last %},{% endif %}{% endfor %} </p>
+        </div>
+</div>
+
+        <script>
+            {% include 'includes/bootstrap/bootstrap.min.js' %}
+        </script>
+
+        <script>
+            {% include 'includes/bootstrap/bootstrap-select.min.js' %}
+        </script>
+
+</body>
+</html>
