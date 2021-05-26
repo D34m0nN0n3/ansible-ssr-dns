@@ -15,18 +15,25 @@
 - name: Create recipient mail address
   set_fact:
     mail_rcpt_to: bind_cont_mail
+    cacheable: no
+  delegate_to: localhost
+  run_once: true
   when: mail_rcpt_to is undefined and bind_cont_mail is defined
 
 - name: Create sender mail address
   set_fact:
     mail_from: "no-reply@{{ ansible_domain }}"
     cacheable: no
+  delegate_to: localhost
+  run_once: true
   when: mail_from is undefined
 
 - name: Create temp path for report
   set_fact:
-    report_html: "{{ playbook_dir }}/Report_updates_{{ report_date }}_{{ random_num }}.html"
+    report_html: "/var/tmp/Report_ISC_BIND_role_{{ report_date }}_{{ random_num }}.html"
     cacheable: no
+  delegate_to: localhost
+  run_once: true
 
 - name: Check service facts
   service_facts: 
@@ -61,6 +68,7 @@
     dest: "{{ report_html }}"
   delegate_to: localhost
   run_once: true
+  become: false
 
 - name: Send mail report
   mail:
@@ -70,15 +78,23 @@
     to: "{{ mail_rcpt_to | default(omit) }}"
     subtype: html
     charset: utf8
-    subject: System update report {{ report_date }}
+    subject: ISC BIND role report {{ report_date }}
     attach: "{{ report_html }}"
-    body: "{{ lookup('file', report_html) }}"
+    body: >
+          <h4 style="text-align: center">Please Open the attached HTML report in a modern javascript enabled web browser.</h4>
+          <hr>
+          <p style="text-align: center">All hosts from inventory: {% for host in groups['all'] %}{{ hostvars[host]['ansible_fqdn'] }}{% if not loop.last %},{% endif %}{% endfor %}</p>
+          <p style="text-align: center">Complite on host succesed: {% for host in play_hosts %}{{ host }}{% if not loop.last %},{% endif %}{% endfor %}</p>
   delegate_to: localhost
   run_once: true
+  become: false
   when: mail_host is defined and mail_from is defined and mail_rcpt_to is defined
 
 - name: Cleanup
   file:
-    path: "{{ playbook_dir }}/Report_updates_{{ report_date }}_{{ random_num }}.html"
+    path: "{{ report_html }}"
     state: absent
+  delegate_to: localhost
+  run_once: true
+  become: false
 ...
