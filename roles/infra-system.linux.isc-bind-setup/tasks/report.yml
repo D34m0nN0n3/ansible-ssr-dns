@@ -74,7 +74,7 @@
     body: "{{ lookup('file', report_html) }}"
   delegate_to: localhost
   run_once: true
-  when: mail_host is defined and mail_port is defined and mail_from is defined and mail_rcpt_to is defined
+  when: mail_host is defined and mail_from is defined and mail_rcpt_to is defined
 
 - name: Cleanup
   file:

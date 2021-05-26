@@ -14,5 +14,5 @@
 
 - name: Include task for generate ans send mail report
   include: report.yml
-  when: mail_host is defined and mail_port is defined and (mail_rcpt_to is defined or bind_cont_mail is defined)
+  when: mail_host is defined and (mail_rcpt_to is defined or bind_cont_mail is defined)
 ...
