@@ -57,7 +57,7 @@
 
 - name: Create reports
   template:
-    src: includes/report/report.j2
+    src: report.j2
     dest: "{{ report_html }}"
   delegate_to: localhost
   run_once: true
@@ -71,6 +71,7 @@
     subtype: html
     charset: utf8
     subject: System update report {{ report_date }}
+    attach: "{{ report_html }}"
     body: "{{ lookup('file', report_html) }}"
   delegate_to: localhost
   run_once: true
