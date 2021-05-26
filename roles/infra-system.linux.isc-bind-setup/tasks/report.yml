@@ -14,7 +14,7 @@
 
 - name: Create recipient mail address
   set_fact:
-    admin_mail_rcpt: bind_cont_mail
+    mail_rcpt_to: bind_cont_mail
   when: mail_rcpt_to is undefined and bind_cont_mail is defined
 
 - name: Create sender mail address
@@ -67,14 +67,14 @@
     host: "{{ mail_host | default(omit) }}"
     port: "{{ mail_port | default('25') }}"
     from: "{{ mail_from | default(omit) }}"
-    to: "{{ admin_mail_rcpt | default(omit) }}"
+    to: "{{ mail_rcpt_to | default(omit) }}"
     subtype: html
     charset: utf8
     subject: System update report {{ report_date }}
     body: "{{ lookup('file', report_html) }}"
   delegate_to: localhost
   run_once: true
-  when: mail_host is defined and mail_port is defined and mail_from is defined and admin_mail_rcpt is defined
+  when: mail_host is defined and mail_port is defined and mail_from is defined and mail_rcpt_to is defined
 
 - name: Cleanup
   file:
