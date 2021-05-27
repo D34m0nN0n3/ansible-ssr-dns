@@ -6,33 +6,6 @@
 # of the License, but changing it is not allowed.
 #*********************************************************************************************************************
 
-if [[ $EUID -ne 0 ]]; then
-   echo "[-] This script must be run as root" 1>&2
-   exit 1
-fi
-
-function print_usage_short {
-    echo "Get help: \"$0\" for help (-h | --help)"
-}
-
-if  [[ $1 == "\-h" ]] ; then
-    print_usage_short
-    exit 1
-fi
-
-function print_usage {
-cat <<EOF
-Use this script: \"$0\" <domain> <file zone>
-
-
-EOF
-}
-
-if  [[ $1 == "\-\-h" ]] ; then
-    print_usage
-    exit 1
-fi
-
 PACKAGES=( bash )
 
 # Export LANG so we get consistent results

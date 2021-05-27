@@ -1,0 +1,6 @@
+---
+- name: Include task for install ISC BIND
+  include: install.yml
+
+
+...
