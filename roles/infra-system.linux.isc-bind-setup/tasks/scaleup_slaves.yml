@@ -1,6 +1,85 @@
 ---
+- name: Create dynamic groups for master and slaves
+  block:
+    - name: Dynamic group for slaves
+      group_by:
+        key: dynamic_group_slaves
+      when: (bind_srv_role is defined and bind_srv_role == 'slave') or
+            ('slaves' in groups and groups['slaves']) and inventory_hostname in groups['slaves']
+
+    - name: Dynamic group for new slaves
+      group_by:
+        key: dynamic_group_new_slaves
+      when: (bind_srv_role is defined and bind_srv_role == 'new_slave') or
+            ('new_slaves' in groups and groups['new_slaves']) and inventory_hostname in groups['new_slaves']
+
+    - name: Get slaves IP
+      set_fact:
+        ip_slaves: "{% for host in groups['dynamic_group_slaves'] %}{% if bind_listen_ipv4 is defined %}{{ hostvars[host]['bind_listen_ipv4'] }}{% else %}{{ hostvars[host]['ansible_default_ipv4'].address }}{% endif %}{%  if not loop.last %},{%  endif %}{% endfor %}"
+        cacheable: no
+
+    - name: Get new slaves IP
+      set_fact:
+        ip_new_slaves: "{% for host in groups['dynamic_group_new_slaves'] %}{% if bind_listen_ipv4 is defined %}{{ hostvars[host]['bind_listen_ipv4'] }}{% else %}{{ hostvars[host]['ansible_default_ipv4'].address }}{% endif %}{%  if not loop.last %},{%  endif %}{% endfor %}"
+        cacheable: no
+  when: (bind_srv_role is defined and bind_srv_role == 'new_slave') or
+        (groups.new_slaves | default([]) | length != 0)
+
 - name: Include task for install ISC BIND
   include: install.yml
+  when: (bind_srv_role is defined and bind_srv_role == 'new_slave') or
+        ('new_slaves' in groups and groups['new_slaves']) and inventory_hostname in groups['new_slaves']
 
+- name: Check contact info is defined
+  block:
+    - name: Add new slave IP in ACL
+      lineinfile:
+        path: /etc/named/acl-list.conf
+        regexp: '^ '
+        insertafter: '^'
+        line: ''
 
+    - name: Copy configuration files
+      synchronize:
+        src: "{{ item }}"
+        dest: "{{ item }}"
+        checksum: yes
+        times: no
+      delegate_to: "{{ ip_slaves.0 }}"
+      with_fileglob:
+        - '/etc/rndc.key'
+        - '/etc/named.conf'
+        - '/etc/named/*'
+      when: (bind_srv_role is defined and bind_srv_role == 'new_slave') or
+            ('new_slaves' in groups and groups['new_slaves']) and inventory_hostname in groups['new_slaves']
+
+    - name: Enable service ISC BIND and ensure it is not masked
+      systemd:
+        name: named-chroot
+        state: started
+        enabled: yes
+        masked: no
+      when: (bind_srv_role is defined and bind_srv_role == 'new_slave') or
+            ('new_slaves' in groups and groups['new_slaves']) and inventory_hostname in groups['new_slaves']
+
+    - name: Enable bind_exporter service
+      systemd:
+        name: bind_exporter
+        state: started
+        enabled: yes
+        masked: no
+      when: (bind_srv_role is defined and bind_srv_role == 'new_slave') or
+            ('new_slaves' in groups and groups['new_slaves']) and inventory_hostname in groups['new_slaves']
+
+    - name: Enable node_exporter service
+      systemd:
+        name: node_exporter
+        state: started
+        enabled: yes
+        masked: no
+      when: (bind_srv_role is defined and bind_srv_role == 'new_slave') or
+            ('new_slaves' in groups and groups['new_slaves']) and inventory_hostname in groups['new_slaves']
+  always:
+    - meta: end_play
+  when: ip_master is defined and ip_new_slaves is defined
 ...

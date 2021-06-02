@@ -33,7 +33,8 @@
       changed_when: false
       when: (bind_srv_role is defined and bind_srv_role == 'slave') or
             ('slaves' in groups and groups['slaves']) and inventory_hostname in groups['slaves']
-
+  when: (bind_srv_role is defined and bind_srv_role != 'new_slave') or
+        ('new_slaves' not in groups and groups['new_slaves']) and inventory_hostname not in groups['new_slaves']
   tags:
     - bind_setupe
 
