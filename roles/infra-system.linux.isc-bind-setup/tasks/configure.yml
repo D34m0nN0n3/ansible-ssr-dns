@@ -114,7 +114,7 @@
     dest: /etc/named.conf
     owner: root
     group: named
-    mode: "0650"
+    mode: "0640"
     setype: named_conf_t
     backup: yes
   tags:
@@ -127,7 +127,7 @@
     dest: /etc/named/acl-list.conf
     owner: root
     group: named
-    mode: "0650"
+    mode: "0640"
     setype: named_conf_t
   tags:
     - bind_configure
@@ -139,7 +139,7 @@
     dest: /etc/named/options.conf
     owner: root
     group: named
-    mode: "0650"
+    mode: "0640"
     setype: named_conf_t
   tags:
     - bind_configure
@@ -161,7 +161,7 @@
     dest: /etc/named/logging.conf
     owner: root
     group: named
-    mode: "0650"
+    mode: "0640"
     setype: named_conf_t
   tags:
     - bind_configure
@@ -173,7 +173,7 @@
     dest: /etc/named/views.conf
     owner: root
     group: named
-    mode: "0650"
+    mode: "0640"
     setype: named_conf_t
   tags:
     - bind_configure
@@ -186,7 +186,7 @@
     dest: '/var/named/rpz.{{ item }}'
     owner: root
     group: named
-    mode: "0650"
+    mode: "0640"
     setype: named_cache_t
   loop:
     - passeddomain.hosts
@@ -206,7 +206,7 @@
         dest: '/etc/named/{{ item }}'
         owner: root
         group: named
-        mode: "0650"
+        mode: "0640"
         setype: named_conf_t
       loop:
         - zones-internal.conf

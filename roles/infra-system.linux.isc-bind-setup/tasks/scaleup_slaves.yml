@@ -1,17 +1,38 @@
 ---
-- name: Create dynamic groups for master and slaves
+- name: Create dynamic groups for master, slaves and new slaves (Set facts)
   block:
+    - name: Dynamic group for new slaves
+      group_by:
+        key: dynamic_group_new_slaves
+      when: (new_slave is defined and new_slave | bool  == true ) or
+            ('new_slaves' in groups and groups['new_slaves']) and inventory_hostname in groups['new_slaves']
+
+    - name: Dynamic group for master
+      group_by:
+        key: dynamic_group_master
+      when: (bind_srv_role is defined and bind_srv_role == 'master') or
+            ('master' in groups and groups['master']) and inventory_hostname in groups['master']
+
     - name: Dynamic group for slaves
       group_by:
         key: dynamic_group_slaves
       when: (bind_srv_role is defined and bind_srv_role == 'slave') or
             ('slaves' in groups and groups['slaves']) and inventory_hostname in groups['slaves']
 
-    - name: Dynamic group for new slaves
+    - name: Dynamic group for all slaves
       group_by:
-        key: dynamic_group_new_slaves
-      when: (bind_srv_role is defined and bind_srv_role == 'new_slave') or
-            ('new_slaves' in groups and groups['new_slaves']) and inventory_hostname in groups['new_slaves']
+        key: dynamic_group_all_slaves
+      when: (('dynamic_group_slaves' in groups and groups['dynamic_group_slaves']) and (inventory_hostname in groups['dynamic_group_slaves'])) or (('dynamic_group_new_slaves' in groups and groups['dynamic_group_new_slaves']) and (inventory_hostname in groups['dynamic_group_new_slaves']))
+
+    - name: Add server role for new host
+      set_fact:
+        bind_srv_role: slave
+      when: ('dynamic_group_new_slaves' in groups and groups['dynamic_group_new_slaves']) and inventory_hostname in groups['dynamic_group_new_slaves'] and bind_srv_role is undefined
+
+    - name: Get master IP
+      set_fact:
+        ip_master: "{% for host in groups['dynamic_group_master'] %}{% if bind_listen_ipv4 is defined %}{{ hostvars[host]['bind_listen_ipv4'] }}{% else %}{{ hostvars[host]['ansible_default_ipv4'].address }}{% endif %}{%  if not loop.last %},{%  endif %}{% endfor %}"
+        cacheable: no
 
     - name: Get slaves IP
       set_fact:
@@ -22,45 +43,176 @@
       set_fact:
         ip_new_slaves: "{% for host in groups['dynamic_group_new_slaves'] %}{% if bind_listen_ipv4 is defined %}{{ hostvars[host]['bind_listen_ipv4'] }}{% else %}{{ hostvars[host]['ansible_default_ipv4'].address }}{% endif %}{%  if not loop.last %},{%  endif %}{% endfor %}"
         cacheable: no
-  when: (bind_srv_role is defined and bind_srv_role == 'new_slave') or
-        (groups.new_slaves | default([]) | length != 0)
 
-- name: Include task for install ISC BIND
+    - name: Get all IPv4 for trust_servers ACL
+      set_fact:
+        trust_servers_dynamic: "{% for host in groups['all'] %}{{ hostvars[host].ansible_all_ipv4_addresses }}{% if not loop.last %},{% endif %}{% endfor %}"
+        cacheable: no
+
+    - name: Get all hostname for NS RR
+      set_fact:
+        hostname_fqdn_dynamic: "{% for host in groups['all'] %}{{ hostvars[host]['ansible_fqdn'] }}{% if not loop.last %},{% endif %}{% endfor %}"
+        cacheable: no
+
+- name: Include tasks for install ISC BIND
   include: install.yml
-  when: (bind_srv_role is defined and bind_srv_role == 'new_slave') or
-        ('new_slaves' in groups and groups['new_slaves']) and inventory_hostname in groups['new_slaves']
+  static: yes
+  when: ('dynamic_group_new_slaves' in groups and groups['dynamic_group_new_slaves']) and inventory_hostname in groups['dynamic_group_new_slaves']
 
-- name: Check contact info is defined
+- name: Check IPv6
   block:
-    - name: Add new slave IP in ACL
+    - name: Check if IPv6 disabled at grub command line
+      slurp:
+        src: /proc/cmdline
+      register: cmdline
+
+    - name: Check ip6 support
+      stat:
+        path: /proc/sys/net/ipv6
+      register: proc_ip6
+
+    - name: IPv6 is enabled on the node
+      set_fact:
+        bind_ip_v6_on: true
+        cacheable: no
+      register: ip_v6_on
+      when: proc_ip6.stat.exists or (ansible_system == 'Linux' and not "ipv6.disable=1" in cmdline.content|b64decode)
+
+    - name: IPv6 is disabled on the node
+      set_fact:
+        bind_ip_v6_on: false
+        cacheable: no
+      when: ip_v6_on.skipped
+  when: bind_ip_v6_on is undefined
+
+- name: Configure new hosts ane reconfigure exist host
+  block:
+    - name: Change config for run IPv4 only if IPv6 disabled
       lineinfile:
-        path: /etc/named/acl-list.conf
-        regexp: '^ '
-        insertafter: '^'
-        line: ''
+        path: /etc/sysconfig/named
+        line: 'OPTIONS="-4"'
+      when: bind_ip_v6_on | bool == false
+
+    - name: Copy main config
+      template:
+        src: named.conf.j2
+        dest: /etc/named.conf
+        owner: root
+        group: named
+        mode: "0650"
+        setype: named_conf_t
+        backup: yes
+
+    - name: Copy ACL rules template file
+      template:
+        src: acl-list.conf.j2
+        dest: /etc/named/acl-list.conf
+        owner: root
+        group: named
+        mode: "0650"
+        setype: named_conf_t
+
+    - name: Copy options template file
+      template:
+        src: options.conf.j2
+        dest: /etc/named/options.conf
+        owner: root
+        group: named
+        mode: "0650"
+        setype: named_conf_t
+
+- name: Create temporary directory
+  tempfile:
+    state: directory
+    suffix: _configs
+  register: tempdir_conf
+  delegate_to: localhost
+  run_once: true
+
+- name: Get config files from slave to temporary directory
+  fetch:
+    src:  "{{ item }}"
+    dest: "{{ tempdir_conf.path }}/"
+    flat: yes
+  with_fileglob: /etc/named/*
+  when: ('dynamic_group_slaves' in groups and groups['dynamic_group_slaves']) and inventory_hostname in groups[['dynamic_group_slaves'][0]]
+
+- name: Remove configs from temporary directory (automate gen)
+  file:
+    path: "{{ tempdir_conf.path }}/{{ item }}"
+    state: absent
+  loop:
+    - acl-list.conf
+    - options.conf
+  delegate_to: localhost
+  run_once: true
+
+- name: Copy configs on new slaves
+  copy:
+    src:  "{{ item }}"
+    dest: "/etc/named/{{ item | basename }}"
+  with_fileglob: "{{ tempdir_conf.path }}/*"
+  when: ('dynamic_group_new_slaves' in groups and groups['dynamic_group_new_slaves']) and inventory_hostname in groups['dynamic_group_new_slaves']
+
+- name: Recursively change ownership of a directory
+  file:
+    path: /etc/named
+    state: directory
+    recurse: yes
+    owner: root
+    group: named
+    mode: "0640"
+    setype: named_conf_t
+  when: ('dynamic_group_new_slaves' in groups and groups['dynamic_group_new_slaves']) and inventory_hostname in groups['dynamic_group_new_slaves']
+
+- name: Change ownership of a directory
+  file:
+    path: /etc/named
+    state: directory
+    owner: root
+    group: named
+    mode: "0650"
+  when: ('dynamic_group_new_slaves' in groups and groups['dynamic_group_new_slaves']) and inventory_hostname in groups['dynamic_group_new_slaves']
+
+- name: Delete temporary directory
+  file:    
+    path: "{{ tempdir_conf.path }}"
+    state: absent
+  delegate_to: localhost
+  run_once: true
+
+- name: Set arry slave hosts IP
+  set_fact:
+    slave_hosts: "{{ slave_hosts | default([]) }} + [ '{{ item }}' ]"
+  with_items: "{{ ip_slaves }}"
+
+- name: Copy configuration files
+  block:
+    - name: Get rndc.key
+      set_fact:
+        rndc_key_gen: "{{ lookup('file', '/etc/rndc.key') }}"
+        cacheable: no
+      delegate_facts: true
+      when: groups[['dynamic_group_slaves'][0]]
 
     - name: Copy configuration files
-      synchronize:
-        src: "{{ item }}"
-        dest: "{{ item }}"
-        checksum: yes
-        times: no
-      delegate_to: "{{ ip_slaves.0 }}"
-      with_fileglob:
-        - '/etc/rndc.key'
-        - '/etc/named.conf'
-        - '/etc/named/*'
-      when: (bind_srv_role is defined and bind_srv_role == 'new_slave') or
-            ('new_slaves' in groups and groups['new_slaves']) and inventory_hostname in groups['new_slaves']
+      copy:
+        content: "{{ rndc_key_gen }}"
+        dest: "/etc/rndc.key"
+        mode: "0750"
+        owner: root
+        group: named
+      changed_when: false
+  when: ('dynamic_group_all_slaves' in groups and groups['dynamic_group_all_slaves']) and inventory_hostname in groups['dynamic_group_all_slaves']
 
+- name: Enable services on new slaves
+  block:
     - name: Enable service ISC BIND and ensure it is not masked
       systemd:
         name: named-chroot
         state: started
         enabled: yes
         masked: no
-      when: (bind_srv_role is defined and bind_srv_role == 'new_slave') or
-            ('new_slaves' in groups and groups['new_slaves']) and inventory_hostname in groups['new_slaves']
 
     - name: Enable bind_exporter service
       systemd:
@@ -68,8 +220,6 @@
         state: started
         enabled: yes
         masked: no
-      when: (bind_srv_role is defined and bind_srv_role == 'new_slave') or
-            ('new_slaves' in groups and groups['new_slaves']) and inventory_hostname in groups['new_slaves']
 
     - name: Enable node_exporter service
       systemd:
@@ -77,9 +227,17 @@
         state: started
         enabled: yes
         masked: no
-      when: (bind_srv_role is defined and bind_srv_role == 'new_slave') or
-            ('new_slaves' in groups and groups['new_slaves']) and inventory_hostname in groups['new_slaves']
-  always:
-    - meta: end_play
-  when: ip_master is defined and ip_new_slaves is defined
+  when: ('dynamic_group_new_slaves' in groups and groups['dynamic_group_new_slaves']) and inventory_hostname in groups['dynamic_group_new_slaves'] 
+
+- name: Reload new configuration file on all hosts
+  command:
+    cmd: /usr/sbin/rndc reconfig
+  throttle: 1
+
+- name: Include task for generate ans send mail report
+  include: report.yml
+  when: mail_host is defined and (mail_rcpt_to is defined or bind_cont_mail is defined)
+
+- name: Finish play
+  meta: end_play
 ...

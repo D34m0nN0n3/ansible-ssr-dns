@@ -25,16 +25,24 @@
     - set_fact:
         rndc_key_gen: "{{ lookup('file', '/etc/rndc.key') }}"
         cacheable: no
+      ignore_errors: true
+      delegate_facts: true
 
     - name: Copy key to slaves nodes
       copy:
         content: "{{ rndc_key_gen }}"
         dest: "/etc/rndc.key"
+      register: result
       changed_when: false
-      when: (bind_srv_role is defined and bind_srv_role == 'slave') or
-            ('slaves' in groups and groups['slaves']) and inventory_hostname in groups['slaves']
-  when: (bind_srv_role is defined and bind_srv_role != 'new_slave') or
-        ('new_slaves' not in groups and groups['new_slaves']) and inventory_hostname not in groups['new_slaves']
+      when: rndc_key_gen is defined
+
+    - name: Change permission on rndc.key
+      file:
+        path: /etc/rndc.key
+        mode: u=rwx,g=rx
+        owner: root
+        group: named
+      when: not result is skipped
   tags:
     - bind_setupe
 

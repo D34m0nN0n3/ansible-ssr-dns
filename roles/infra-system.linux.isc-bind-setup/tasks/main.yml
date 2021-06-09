@@ -1,4 +1,14 @@
 ---
+- name: Check run scaleup tasks
+  set_fact:
+    scaleup: true
+  when: (ansible_play_hosts_all | map('extract', hostvars, 'new_slave') | select | list ) or
+        (groups.new_slaves | default([]) | length != 0)
+
+- name: Include task for scaleup ISC BIND
+  include: scaleup_slaves.yml
+  when: scaleup | bool == true
+
 - name: Include task for install ISC BIND
   include: install.yml
 
