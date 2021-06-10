@@ -29,35 +29,30 @@
         bind_srv_role: slave
       when: ('dynamic_group_new_slaves' in groups and groups['dynamic_group_new_slaves']) and inventory_hostname in groups['dynamic_group_new_slaves'] and bind_srv_role is undefined
 
-    - name: Get master IP
-      set_fact:
-        ip_master: "{% for host in groups['dynamic_group_master'] %}{% if bind_listen_ipv4 is defined %}{{ hostvars[host]['bind_listen_ipv4'] }}{% else %}{{ hostvars[host]['ansible_default_ipv4'].address }}{% endif %}{%  if not loop.last %},{%  endif %}{% endfor %}"
-        cacheable: no
-
-    - name: Get slaves IP
-      set_fact:
-        ip_slaves: "{% for host in groups['dynamic_group_slaves'] %}{% if bind_listen_ipv4 is defined %}{{ hostvars[host]['bind_listen_ipv4'] }}{% else %}{{ hostvars[host]['ansible_default_ipv4'].address }}{% endif %}{%  if not loop.last %},{%  endif %}{% endfor %}"
-        cacheable: no
-
-    - name: Get new slaves IP
-      set_fact:
-        ip_new_slaves: "{% for host in groups['dynamic_group_new_slaves'] %}{% if bind_listen_ipv4 is defined %}{{ hostvars[host]['bind_listen_ipv4'] }}{% else %}{{ hostvars[host]['ansible_default_ipv4'].address }}{% endif %}{%  if not loop.last %},{%  endif %}{% endfor %}"
-        cacheable: no
-
     - name: Get all IPv4 for trust_servers ACL
       set_fact:
         trust_servers_dynamic: "{% for host in groups['all'] %}{{ hostvars[host].ansible_all_ipv4_addresses }}{% if not loop.last %},{% endif %}{% endfor %}"
         cacheable: no
 
-    - name: Get all hostname for NS RR
+    - name: Get new slaves hostname for NS RR
       set_fact:
-        hostname_fqdn_dynamic: "{% for host in groups['all'] %}{{ hostvars[host]['ansible_fqdn'] }}{% if not loop.last %},{% endif %}{% endfor %}"
+        hostname_fqdn_dynamic: "{% for host in groups['dynamic_group_new_slaves'] %}{{ hostvars[host]['ansible_fqdn'] }}{% if not loop.last %},{% endif %}{% endfor %}"
         cacheable: no
+
+    - name: Set array new slaves hostname
+      set_fact:
+        new_slave_hosts: "{{ new_slave_hosts | default([]) }} + [ '{{ item }}' ]"
+      with_items: "{{ hostname_fqdn_dynamic }}"
 
 - name: Include tasks for install ISC BIND
   include: install.yml
   static: yes
   when: ('dynamic_group_new_slaves' in groups and groups['dynamic_group_new_slaves']) and inventory_hostname in groups['dynamic_group_new_slaves']
+
+- name: Create backup
+  service:
+    name: bind-backup-incremental.service
+    state: started
 
 - name: Check IPv6
   block:
@@ -103,15 +98,6 @@
         setype: named_conf_t
         backup: yes
 
-    - name: Copy ACL rules template file
-      template:
-        src: acl-list.conf.j2
-        dest: /etc/named/acl-list.conf
-        owner: root
-        group: named
-        mode: "0650"
-        setype: named_conf_t
-
     - name: Copy options template file
       template:
         src: options.conf.j2
@@ -120,6 +106,38 @@
         group: named
         mode: "0650"
         setype: named_conf_t
+  when: ('dynamic_group_new_slaves' in groups and groups['dynamic_group_new_slaves']) and inventory_hostname in groups['dynamic_group_new_slaves']
+
+- name: Copy ACL rules template file
+  template:
+    src: acl-list.conf.j2
+    dest: /etc/named/acl-list.conf
+    owner: root
+    group: named
+    mode: "0650"
+    setype: named_conf_t
+
+- name: Adding new nodes to the zone files
+  block:
+    - name: Set files list
+      set_fact:
+        zone_files: "{{ lookup('fileglob', '/var/named/masters/*', wantlist=True) | flatten }}"
+        cacheable: no
+
+    - name: Set RR list
+      set_fact:
+        ns_rr: "{{ new_slave_hosts | flatten }}"
+        cacheable: no
+
+    - name: Add records to files
+      lineinfile:
+        dest: "{{ item.0 }}"
+        state: present
+        insertbefore: '.*NS\s*\S{4,24}'
+        line: "                        IN  NS     {{ item.1 }}."
+        firstmatch: yes
+      loop: "{{ zone_files | product(ns_rr) | list }}"
+      when: ('dynamic_group_master' in groups and groups['dynamic_group_master']) and inventory_hostname in groups['dynamic_group_master']
 
 - name: Create temporary directory
   tempfile:
@@ -135,7 +153,8 @@
     dest: "{{ tempdir_conf.path }}/"
     flat: yes
   with_fileglob: /etc/named/*
-  when: ('dynamic_group_slaves' in groups and groups['dynamic_group_slaves']) and inventory_hostname in groups[['dynamic_group_slaves'][0]]
+  when: new_slave is undefined and
+        ('dynamic_group_slaves' in groups and groups['dynamic_group_slaves']) and (inventory_hostname not in groups['dynamic_group_new_slaves'] and inventory_hostname in groups[['dynamic_group_slaves'][0]])
 
 - name: Remove configs from temporary directory (automate gen)
   file:
@@ -180,11 +199,6 @@
     state: absent
   delegate_to: localhost
   run_once: true
-
-- name: Set arry slave hosts IP
-  set_fact:
-    slave_hosts: "{{ slave_hosts | default([]) }} + [ '{{ item }}' ]"
-  with_items: "{{ ip_slaves }}"
 
 - name: Copy configuration files
   block:
@@ -231,7 +245,7 @@
 
 - name: Reload new configuration file on all hosts
   command:
-    cmd: /usr/sbin/rndc reconfig
+    cmd: /usr/sbin/rndc reload
   throttle: 1
 
 - name: Include task for generate ans send mail report

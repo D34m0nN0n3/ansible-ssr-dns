@@ -168,7 +168,6 @@
         - bind-backup-incremental.timer
       notify:
         - BIND_backup
-
   tags:
     - bind_setupe
     - bind_backup

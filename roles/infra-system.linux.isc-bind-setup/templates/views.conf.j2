@@ -52,8 +52,6 @@ zone "rpz.passeddomain.hosts" IN {
 {%   endif %}
       file "/var/named/rpz.passeddomain.hosts";
 {%   if inventory_hostname in groups['dynamic_group_master'] %}
-      allow-transfer { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
-      also-notify { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
       allow-update { none; };
       notify yes;
 {%   else %}
@@ -70,8 +68,6 @@ zone "rpz.changeddomain.hosts" IN {
 {%   endif %}
       file "/var/named/rpz.changeddomain.hosts";
 {%   if inventory_hostname in groups['dynamic_group_master'] %}
-      allow-transfer { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
-      also-notify { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
       allow-update { none; };
       notify yes;
 {%   else %}
@@ -88,8 +84,6 @@ zone "rpz.blockeddomain.hosts" IN {
 {%   endif %}
       file "/var/named/rpz.blockeddomain.hosts";
 {%   if inventory_hostname in groups['dynamic_group_master'] %}
-      allow-transfer { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
-      also-notify { {%  for slaves in list_slaves %}{{ slaves }}; {%  endfor %}};
       allow-update { none; };
       notify yes;
 {%   else %}
