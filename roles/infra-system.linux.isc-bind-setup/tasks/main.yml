@@ -7,7 +7,7 @@
 
 - name: Include task for scaleup ISC BIND
   include: scaleup_slaves.yml
-  when: scaleup | bool == true
+  when: scaleup is defined and (scaleup | bool == true)
 
 - name: Include task for install ISC BIND
   include: install.yml
