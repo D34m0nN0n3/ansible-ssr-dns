@@ -20,16 +20,20 @@ nav:
     - Дополнительные материалы: 'seealso.md'
 
 plugins:
-    - search
-    - git-revision-date-localized
-    - git-revision-date
-    - macros
-    - pdf-export:
-        verbose: true
-        media_type: print
-        combined: true
-        combined_output_path: 'pdf/Установка_и_настройка_сервера_разрешения_имен.pdf'
-        theme_handler_path: theme-handler/material.py
+  - search:
+      lang:
+        - en
+        - ru
+  - git-revision-date-localized
+      type: date
+  - git-revision-date
+  - macros
+  - pdf-export:
+      verbose: true
+      media_type: print
+      combined: true
+      combined_output_path: 'pdf/Установка_и_настройка_сервера_разрешения_имен.pdf'
+      theme_handler_path: theme-handler/material.py
 
 theme:
   name: material
