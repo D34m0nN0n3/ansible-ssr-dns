@@ -49,13 +49,13 @@ theme:
     tabs: false
 
 extra:
-  search:
-    language: 'ru, en'
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/D34m0nN0n3/ansible-ssr-dns/
     - icon: fontawesome/brands/gitlab
       link: https://gitlab-lb-01.gvc.oao.rzd/D34m0nN0n3/ansible-ssr-dns/
+  search:
+    language: 'ru, en'
     
 extra_css:
   - material/assets/css/main.css
