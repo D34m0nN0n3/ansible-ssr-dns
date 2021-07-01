@@ -57,7 +57,8 @@
     ``` console
     sudo systemctl restart nscd.service
     ```
-
+----
+Очистка кеша на клиенте.
 ----
 
 Выполнить разрешение имен:  
