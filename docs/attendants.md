@@ -58,7 +58,7 @@
     sudo systemctl restart nscd.service
     ```
 ----
-    Очистка кеша на клиенте.
+  Очистка кеша на клиенте.
 
 ----
 
