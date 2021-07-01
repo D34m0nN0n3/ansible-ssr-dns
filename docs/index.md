@@ -9,7 +9,7 @@
 * infra-system.linux.os.resolv
 * infra-system.linux.os.dnsmasq-resolver
 
-!!! tip
+!!! tip "Подсказка"
     Для создания закладки в браузере на данное руководство: ++ctrl+d++
 
 ## Дополнительные материалы
