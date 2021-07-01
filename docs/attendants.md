@@ -60,7 +60,7 @@
     sudo systemctl restart nscd.service
     ``` 
 #  
-
+#  
 Выполнить разрешение имен:  
 
 !!! example "Разрешения имен"
