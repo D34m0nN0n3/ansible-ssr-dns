@@ -43,8 +43,4 @@ Key                 |INFO
 
 *При запуске и в момент исполнения формируется файл с логами для анализа ошибок `logs/ansible-log.log`. Размер файла зависит от уровня подробного вызова и количества запусков сценария.*
 
-## Параметры и теги
-Все параметры и теги приведены в отдельных разделах документации по ролям:
-
-1.  [infra-system.linux.isc-bind-setup](docs/roles/dns_server.md)
-2.  [infra-system.linux.os.resolv](docs/roles/dns_client.md)
+[Документация](https://D34m0nN0n3.github.io/ansible-ssr-dns/)

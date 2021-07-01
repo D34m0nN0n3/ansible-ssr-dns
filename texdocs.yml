@@ -1,0 +1,115 @@
+site_name: Setup ISC BIND 9
+site_url: "https://D34m0nN0n3.github.io/ansible-ssr-dns/"
+site_author: "Dmitriy Prigoda"
+site_description: >-
+  Установка и настройка ISC BIND 9
+
+repo_name: D34m0nN0n3/ansible-ssr-dns
+repo_url: https://gitlab-lb-01.gvc.oao.rzd/d34m0nn0n3/ansible-ssr-dns
+edit_uri: ""
+
+use_directory_urls: false
+
+copyright: Copyright &copy; <a href="https://github.com/D34m0nN0n3">Dmitriy Prigoda</a>.
+
+nav:
+    - Общее описание: 'index.md'
+    - Роли:
+      - ISC BIND 9: 'roles/dns_server.md'
+      - resolv.conf: 'roles/dns_client.md'
+      - dnsmasq: 'roles/dnsmasq.md'
+    - Структура git репозитория с предыдущей конфигурацией: 'git_last_conf.md'
+    - Стратегия развертывания, пере развертывания: 'deployment_strategy.md'
+    - Инструкция сменного персонала: 'attendants.md'
+    - Дополнительные материалы: 'seealso.md'
+
+plugins:
+  - autolinks
+  - search:
+      lang:
+        - en
+        - ru
+  - section-index
+  - table-reader
+  - thumbnails:
+      style: margin-top:5px;margin-bottom:5px;margin-right:25px  
+  - git-revision-date-localized
+  - git-revision-date
+  - macros
+  - minify:
+      minify_html: true
+  - with-pdf:
+      copyright: https://github.com/D34m0nN0n3
+      cover_subtitle: ''
+      output_path: Install_&_configure_BIND_9.pdf
+
+extra_css:
+    - assets/extra.css
+
+extra_javascript:
+  - assets/extra.js
+  - assets/tex-mml-chtml.js
+
+theme:
+  name: material
+  custom_dir: material
+  language: ru
+  features:
+    - content.tabs.link
+    - navigation.indexes
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.integrate
+  palette:
+    - scheme: default
+      primary: blue grey
+      accent: red
+  font:
+    text: Roboto
+    code: Roboto Mono
+  favicon: assets/img/favicon/favicon.png
+  logo: assets/img/logo/logo.svg
+
+markdown_extensions:
+  - admonition
+  - codehilite:
+      linenums: true
+  - toc:
+      permalink: true
+      slugify: !!python/name:pymdownx.slugs.uslugify
+  - meta
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.keys
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - markdown_blockdiag:
+      format: svg
+  - markdown_include.include
+  - markdown.extensions.attr_list 
+
+extra:
+  generator: false
+  homepage: http://gvc-tex-docs-01.gvc.oao.rzd
+  social:
+    - icon: fontawesome/solid/home
+      link: http://gvc-tex-docs-01.gvc.oao.rzd
+      name: Tex-docs
+    - icon: fontawesome/brands/gitlab
+      link: https://gitlab-lb-01.gvc.oao.rzd/d34m0nn0n3
+      name: GitLab projects
+    - icon: fontawesome/solid/mail-bulk
+      link: mailto:prigodadv@gvc.rzd

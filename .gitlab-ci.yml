@@ -1,42 +1,17 @@
-    stages:
-      - pre
-      - clone
-      - build
-      - deploy
-      - post
-    variables:
-      DIR_NAME: "Установка и настройка ISC BIND 9"
+stages:
+  - deploy
 
-    cleanup_pre:
-      tags:
-        - mkdocs
-      stage: pre
-      script:
-        - if [ -d /home/gitlab-runner/$CI_PROJECT_NAME ]; then sudo rm -rf /home/gitlab-runner/$CI_PROJECT_NAME; fi
-    clone_config:
-      tags:
-        - mkdocs
-      stage: clone
-      script:
-        - git -C /home/gitlab-runner/ clone $CI_REPOSITORY_URL
-    build_config:
-      tags:
-        - mkdocs
-      stage: build
-      script:
-        - sudo su - mkdocs -c "cd /home/gitlab-runner/$CI_PROJECT_NAME/; mkdocs build"
-        - if ! [ -d /var/www/base/docs/"$DIR_NAME" ]; then sudo mkdir /var/www/base/docs/"$DIR_NAME"; else sudo rm -rf /var/www/base/docs/"$DIR_NAME"; sudo mkdir /var/www/base/docs/"$DIR_NAME"; fi
-    deploy_config:
-      tags:
-        - mkdocs
-      stage: deploy
-      script:
-        - cd /home/gitlab-runner/$CI_PROJECT_NAME/
-        - sudo mv site/* /var/www/base/docs/"$DIR_NAME"/
-    cleanup_post:
-      tags:
-        - mkdocs
-      stage: post
-      script:
-        - sudo rm -rf /home/gitlab-runner/$CI_PROJECT_NAME
-      when: always
+deploy:
+  stage: deploy
+  only:
+    - main
+    - master
+    - merge_requests
+  tags:
+    - mkdocs
+  before_script:
+    - if [ ! -d $CI_PROJECT_DIR/docs/assets ];  then ln -s /var/mkdocs/templates/docs/assets/ $CI_PROJECT_DIR/docs/; fi
+    - if [ ! -d $CI_PROJECT_DIR/material ];  then ln -s /var/mkdocs/templates/material/ $CI_PROJECT_DIR/; fi
+    - VIRT_SITE_NAME=$(cat texdocs.yml | python /usr/local/lib/python3.6/site-packages/shyaml.py get-value site_description)
+  script:
+    - cd $CI_PROJECT_DIR && sudo -u mkdocs /var/mkdocs/.local/bin/mkdocs build -c -f texdocs.yml -d "/var/www/base/docs/$VIRT_SITE_NAME"

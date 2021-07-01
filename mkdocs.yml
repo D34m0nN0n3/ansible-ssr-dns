@@ -1,12 +1,16 @@
 site_name: Setup ISC BIND 9
-site_description: "Установка и настройка сервера разрешения имен"
-site_url: http://gvc-tex-docs-01.gvc.oao.rzd/
-copyright: Copyright &copy; <a href="https://github.com/D34m0nN0n3">Dmitriy Prigoda</a>.
+site_url: "https://D34m0nN0n3.github.io/ansible-ssr-dns/"
+site_author: "Dmitriy Prigoda"
+site_description: >-
+  Установка и настройка ISC BIND 9
 
-repo_name: "ansible-ssr-dns"
-repo_url: "https://github.com/D34m0nN0n3/ansible-ssr-dns"
+repo_name: D34m0nN0n3/ansible-ssr-dns
+repo_url: https://github.com/D34m0nN0n3/ansible-ssr-dns
+edit_uri: ""
 
 use_directory_urls: false
+
+copyright: Copyright &copy; <a href="https://github.com/D34m0nN0n3">Dmitriy Prigoda</a>.
 
 nav:
     - Общее описание: 'index.md'
@@ -20,52 +24,54 @@ nav:
     - Дополнительные материалы: 'seealso.md'
 
 plugins:
+  - autolinks
   - search:
       lang:
         - en
         - ru
-  - git-revision-date-localized:
-      type: date
+  - section-index
+  - table-reader
+  - thumbnails:
+      style: margin-top:5px;margin-bottom:5px;margin-right:25px  
+  - git-revision-date-localized
   - git-revision-date
   - macros
-  - pdf-export:
-      verbose: true
-      media_type: print
-      combined: true
-      combined_output_path: 'pdf/Установка_и_настройка_сервера_разрешения_имен.pdf'
-      theme_handler_path: theme-handler/material.py
+  - minify:
+      minify_html: true
+  - with-pdf:
+      copyright: https://github.com/D34m0nN0n3
+      cover_subtitle: ''
+      output_path: Install_&_configure_BIND_9.pdf
+
+extra_css:
+    - assets/extra.css
+
+extra_javascript:
+  - assets/extra.js
+  - assets/tex-mml-chtml.js
 
 theme:
   name: material
-  custom_dir: 'material'
+  custom_dir: material
+  language: ru
+  features:
+    - content.tabs.link
+    - navigation.indexes
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.integrate
   palette:
-    scheme: default
-    primary: blue grey
-    accent: red
-  logo: 'assets/img/logo/logo.svg'
-  favicon: 'assets/img/favicon/favicon.ico'
-  language: 'ru'
-  feature:
-    tabs: false
-
-extra:
-  social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/D34m0nN0n3/ansible-ssr-dns/
-    - icon: fontawesome/brands/gitlab
-      link: https://gitlab-lb-01.gvc.oao.rzd/D34m0nN0n3/ansible-ssr-dns/
-  search:
-    language: 'ru, en'
-    
-extra_css:
-  - material/assets/css/main.css
-  - material/assets/libs/magnific-popup/magnific-popup.css
-  - material/assets/css/pdf.css
-
-extra_javascript:
-  - material/assets/libs/jquery/jquery-3.4.0.min.js
-  - material/assets/libs/magnific-popup/jquery.magnific-popup.min.js
-  - material/assets/js/main.js
+    - scheme: default
+      primary: blue grey
+      accent: red
+  font:
+    text: Roboto
+    code: Roboto Mono
+  favicon: assets/img/favicon/favicon.png
+  logo: assets/img/logo/logo.svg
 
 markdown_extensions:
   - admonition
@@ -93,3 +99,10 @@ markdown_extensions:
   - markdown_blockdiag:
       format: svg
   - markdown_include.include
+  - markdown.extensions.attr_list 
+
+extra:
+  generator: false
+  analytics:
+    provider: google
+    property: G-BT11X31T69
