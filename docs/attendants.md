@@ -48,6 +48,8 @@
 !!! hint "Подсказка"
     В Linux `nslookup` требуется установить отдельно.
 
+Очистка кеша на клиенте.
+
 !!! example inline "Для Windows"
     ``` console
     ipconfig \flushdns
@@ -56,9 +58,7 @@
 !!! example inline end "Для Linux"
     ``` console
     sudo systemctl restart nscd.service
-    ```
-Очистка кеша на клиенте.
-#  
+    ``` 
 #  
 Выполнить разрешение имен:  
 
