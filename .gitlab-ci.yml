@@ -15,3 +15,14 @@ deploy:
     - VIRT_SITE_NAME=$(cat texdocs.yml | python /usr/local/lib/python3.6/site-packages/shyaml.py get-value site_description)
   script:
     - cd $CI_PROJECT_DIR && sudo -u mkdocs /var/mkdocs/.local/bin/mkdocs build -c -f texdocs.yml -d "/var/www/base/docs/$VIRT_SITE_NAME"
+
+reconfig:
+  stage: deploy
+  only:
+    - main
+    - master
+    - merge_requests
+  tags:
+    - mkdocs
+  script:
+    - sudo ansible-playbook /var/mkdocs/new_docs/playbook.yml
