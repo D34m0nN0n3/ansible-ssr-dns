@@ -1,0 +1,13 @@
+---
+- hosts: all
+  gather_facts: true
+
+  tasks:
+    - include_role:
+        name: '{{ run_role }}'
+      loop:
+        - 'infra-system.linux.os.resolv'
+        - 'infra-system.linux.isc-bind-setup'
+      loop_control:
+        loop_var: run_role
+...

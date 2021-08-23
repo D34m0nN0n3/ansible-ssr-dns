@@ -1,0 +1,17 @@
+---
+- hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Include role for setup ISC BIND
+      include: roles/infra-system.linux.isc-bind-setup/tasks/main.yml
+      when: role_isc-bind-setup is defined and (role_isc-bind-setup | bool == true)
+    
+    - name: Include role for configure resolv.conf
+      include: roles/infra-system.linux.os.resolv/tasks/main.yml
+      when: role_resolv is defined and (role_resolv | bool == true)
+    
+    - name: Include role for setup DNSMasq
+      include: role/infra-system.linux.os.dnsmasq-resolver/tasks/main.yml
+      when: role_dnsmasq-resolver is defined and (role_dnsmasq-resolver | bool == true)
+...
