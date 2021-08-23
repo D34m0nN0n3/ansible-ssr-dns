@@ -1,0 +1,9 @@
+---
+- hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Include role for setup DNSMasq
+      include_role:
+        name: infra-system.linux.os.dnsmasq-resolver
+...
