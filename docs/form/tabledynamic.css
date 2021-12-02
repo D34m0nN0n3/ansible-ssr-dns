@@ -1,6 +1,7 @@
 /* form.css */
 
 input {
+    width: 100%;
     height: 1.8rem;
     padding: 16px 20px;
     border: none;
@@ -29,6 +30,7 @@ input {
   }
   
   input[type=button], input[type=submit], input[type=reset] {
+    width: 300px;
     background-color: #30383f;
     border: 2px solid black;
     border-radius: .1rem;
