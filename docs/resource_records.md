@@ -10,7 +10,7 @@
     <tr>
         <td style="min-width:300px"><input type="text" maxlength="32" placeholder="Имя" id="name"></td>
         <td style="min-width:150px"><input type="text" minlength="3" maxlength="16" placeholder="Домен" id="domain"></td>
-        <td style="min-width:180px"><input type="text" minlength="7" maxlength="15" size="15" required pattern="\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}" placeholder="IP address" id="ip1"><span class="validity"></span></td>
+        <td style="min-width:180px"><input type="text" minlength="7" maxlength="15" size="15" required pattern="\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}" placeholder="IP address" id="ip"><span class="validity"></span></td>
     </tr>
 </table>
 <input type="button" id="add" value="Добавить веденные данные в таблицу" onclick="Javascript:addRow()">
