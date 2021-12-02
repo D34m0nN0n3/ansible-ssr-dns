@@ -60,7 +60,9 @@
 </table>
 <input type="button" id="add" value="Добавить веденные данные в таблицу" onclick="Javascript:addRow()">
 &nbsp;
- 
+&nbsp;
+&nbsp;
+
 </div>
 <div id="mydata">
 <b>Данные для добавления в DNS...</b>
@@ -72,5 +74,6 @@
     </tr>
 </table>
 &nbsp;
- 
+&nbsp;
+
 </div>
