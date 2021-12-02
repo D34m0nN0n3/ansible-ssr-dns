@@ -23,6 +23,7 @@
     <tr>
         <th style="min-width:300px"><b>Forward records</b></th>
         <th style="min-width:180px"><b>Reverse records</b></th>
+        <th>&nbsp;</th>
     </tr>
 </table>
 &nbsp;
