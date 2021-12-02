@@ -52,10 +52,10 @@
         <th>Значение *</th>
     </tr>
     <tr>
-        <td style="min-width:300px"><input type="text" maxlength="32" placeholder="Имя" id="name"></td>
+        <td style="min-width:150px"><input type="text" maxlength="32" placeholder="Имя" id="name"></td>
         <td style="min-width:150px"><input type="text" minlength="3" maxlength="16" placeholder="Домен" id="domain"></td>
         <td style="min-width:250px"><select name="RR type" id="type" tabindex="0"><option value="">Выберите из списка</option><option value="A">A</option><option value="CNAME">CNAME</option><option value="MX">MX</option><option value="RP">RP</option><option value="SRV">SRV</option><option value="SSHFP">SSHFP</option><option value="TXT">TXT</option></select></td>
-        <td style="min-width:180px"><input type="text" minlength="2" maxlength="256" size="15" id="rr"></td>
+        <td style="min-width:350px"><input type="text" minlength="2" maxlength="256" size="15" id="rr"></td>
     </tr>
 </table>
 <input type="button" id="add" value="Добавить веденные данные в таблицу" onclick="Javascript:addRow()">
@@ -69,7 +69,7 @@
 <table id="myTableData" cellpadding="2">
     <tr>
         <th style="min-width:300px"><b>Forward records</b></th>
-        <th style="min-width:180px"><b>Reverse records</b></th>
+        <th style="min-width:300px"><b>Reverse records</b></th>
         <th>&nbsp;</th>
     </tr>
 </table>
