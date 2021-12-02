@@ -1,16 +1,17 @@
 # Базовая структура проекта c предыдущей конфигурацией
 
-!!! example "Cтруктура"
-        .
-        |
-        |-masters
-        |       |_ ...
-        |
-        |_external-include-extanded.conf
-        |
-        |_internal-include-extanded.conf
-        |
-        |_named.zones
+``` bash
+    .
+    |
+    |-masters
+    |       |_ ...
+    |
+    |_external-include-extanded.conf
+    |
+    |_internal-include-extanded.conf
+    |
+    |_named.zones
+```
 
 
 | Директории и файлы             | Описание                                                                   |
