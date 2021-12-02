@@ -21,6 +21,7 @@ nav:
     - Структура git репозитория с предыдущей конфигурацией: 'git_last_conf.md'
     - Стратегия развертывания, пере развертывания: 'deployment_strategy.md'
     - Инструкция сменного персонала: 'attendants.md'
+    - Ресурсные записи DNS: 'resource_records.md'
     - Дополнительные материалы: 'seealso.md'
 
 plugins:
