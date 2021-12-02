@@ -45,11 +45,13 @@ plugins:
       output_path: Install_&_configure_BIND_9.pdf
 
 extra_css:
-    - assets/extra.css
+  - assets/extra.css
+  - form/tabledynamic.css
 
 extra_javascript:
   - assets/extra.js
   - assets/tex-mml-chtml.js
+  - form/tabledynamic.js
 
 theme:
   name: material
