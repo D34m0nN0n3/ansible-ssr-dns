@@ -30,14 +30,14 @@
 
 |  Тип  | Описание                                                                                                                    |                 RFC                 |
 | :---: | :-------------------------------------------------------------------------------------------------------------------------- | :---------------------------------: |
-|   A   | Адресная запись, соответствие между именем и IP-адресом                                                                     | https://tools.ietf.org/html/rfc1035 |
-| CNAME | Каноническое имя для псевдонима (одноуровневая переадресация)                                                               | https://tools.ietf.org/html/rfc1035 |
-|  MX   | Адрес почтового шлюза для домена. Состоит из двух частей — приоритета (чем число больше, тем ниже приоритет), и адреса узла | https://tools.ietf.org/html/rfc1035 |
-|  PTR  | Соответствие адреса имени — обратное соответствие для A                                                                     | https://tools.ietf.org/html/rfc1035 |
-|  RP   | Ответственный                                                                                                               | https://tools.ietf.org/html/rfc1183 |
-|  SRV  | Указание на местоположение серверов для сервисов                                                                            | https://tools.ietf.org/html/rfc2782 |
-| SSHFP | Отпечаток ключа SSH                                                                                                         | https://tools.ietf.org/html/rfc4255 |
-|  TXT  | Запись произвольных двоичных данных, до 255 байт в размере                                                                  | https://tools.ietf.org/html/rfc1035 |
+|   A   | Адресная запись, соответствие между именем и IP-адресом                                                                     | [1035](https://tools.ietf.org/html/rfc1035) |
+| CNAME | Каноническое имя для псевдонима (одноуровневая переадресация)                                                               | [1035](https://tools.ietf.org/html/rfc1035) |
+|  MX   | Адрес почтового шлюза для домена. Состоит из двух частей — приоритета (чем число больше, тем ниже приоритет), и адреса узла | [1035](https://tools.ietf.org/html/rfc1035) |
+|  PTR  | Соответствие адреса имени — обратное соответствие для A                                                                     | [1035](https://tools.ietf.org/html/rfc1035) |
+|  RP   | Ответственный                                                                                                               | [1183](https://tools.ietf.org/html/rfc1183) |
+|  SRV  | Указание на местоположение серверов для сервисов                                                                            | [2782](https://tools.ietf.org/html/rfc2782) |
+| SSHFP | Отпечаток ключа SSH                                                                                                         | [4255](https://tools.ietf.org/html/rfc4255) |
+|  TXT  | Запись произвольных двоичных данных, до 255 байт в размере                                                                  | [1035](https://tools.ietf.org/html/rfc1035) |
 
 
 ## Форма для генерации записей
@@ -54,6 +54,7 @@
     <tr>
         <td style="min-width:300px"><input type="text" maxlength="32" placeholder="Имя" id="name"></td>
         <td style="min-width:150px"><input type="text" minlength="3" maxlength="16" placeholder="Домен" id="domain"></td>
+        <td style="min-width:250px"><select name="RR type" id="type" tabindex="0"><option value="">Выберите из списка</option><option value="A">A</option><option value="CNAME">CNAME</option><option value="MX">MX</option><option value="RP">RP</option><option value="SRV">SRV</option><option value="SSHFP">SSHFP</option><option value="TXT">TXT</option></select></td>
         <td style="min-width:180px"><input type="text" minlength="2" maxlength="256" size="15" id="rr"></td>
     </tr>
 </table>
