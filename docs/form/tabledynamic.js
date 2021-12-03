@@ -20,6 +20,7 @@ function addRow() {
        row.insertCell(2).innerHTML= '<input type="button" value = "Удалить" onClick="Javacsript:deleteRow(this)">';
     } else {
         row.insertCell(0).innerHTML= NAME.value + '.' + DOMAIN.value + '.' + '&nbsp;&nbsp;&nbsp;&nbsp;IN&nbsp;&nbsp;' + TYPE.value + '&nbsp;&nbsp;&nbsp;&nbsp;' + RESOURCERECORD.value;
+        row.insertCell(1).innerHTML= '&nbsp;';
         row.insertCell(2).innerHTML= '<input type="button" value = "Удалить" onClick="Javacsript:deleteRow(this)">';
     }
  
