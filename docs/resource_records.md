@@ -75,7 +75,7 @@
         <th>&nbsp;</th>
     </tr>
 </table>
-<input type="button" id="add" value="Сохранить таблицу в CSV" onclick="Javascript:exportTableToCSV('dns_rr.csv')">
+<input type="button" id="download" value="Сохранить таблицу в CSV" onclick="Javascript:exportTableToCSV('dns_rr.csv')">
 &nbsp;
 
 </div>
