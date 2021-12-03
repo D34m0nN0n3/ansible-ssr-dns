@@ -14,7 +14,7 @@ function addRow() {
     var rowCount = table.rows.length;
     var row = table.insertRow(rowCount);
  
-    if (TYPE === 'A') {
+    if (TYPE.value === 'A') {
        row.insertCell(0).innerHTML= NAME.value + '.' + DOMAIN.value + '.' + '&nbsp;&nbsp;&nbsp;&nbsp;IN&nbsp;&nbsp;A&nbsp;&nbsp;&nbsp;&nbsp;' + RESOURCERECORD.value;
        row.insertCell(1).innerHTML= PTR + '.in-addr.arpa.&nbsp;&nbsp;&nbsp;&nbsp;IN&nbsp;&nbsp;PTR&nbsp;&nbsp;&nbsp;&nbsp;' + NAME.value + '.' + DOMAIN.value + '.';
        row.insertCell(2).innerHTML= '<input type="button" value = "Удалить" onClick="Javacsript:deleteRow(this)">';

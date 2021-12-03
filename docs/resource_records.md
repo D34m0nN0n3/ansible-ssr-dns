@@ -57,8 +57,8 @@
     <tr>
         <td style="min-width:150px"><input type="text" maxlength="32" placeholder="Имя" id="name"></td>
         <td style="min-width:150px"><input type="text" minlength="3" maxlength="16" placeholder="Домен" id="domain"></td>
-        <td style="min-width:50px"><select name="RR type" id="type" tabindex="0"><option value="A">A</option><option value="CNAME">CNAME</option><option value="MX">MX</option><option value="RP">RP</option><option value="SRV">SRV</option><option value="SSHFP">SSHFP</option><option value="TXT">TXT</option></select></td>
-        <td style="min-width:550px"><input type="text" minlength="2" maxlength="255" size="15" id="rr"></td>
+        <td style="min-width:100px"><select name="RR type" id="type" tabindex="0"><option value="A">A</option><option value="CNAME">CNAME</option><option value="MX">MX</option><option value="RP">RP</option><option value="SRV">SRV</option><option value="SSHFP">SSHFP</option><option value="TXT">TXT</option></select></td>
+        <td style="min-width:500px"><input type="text" minlength="2" maxlength="255" size="15" id="rr"></td>
     </tr>
 </table>
 <input type="button" id="add" value="Добавить веденные данные в таблицу" onclick="Javascript:addRow()">
