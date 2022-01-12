@@ -29,7 +29,7 @@ bash
 # Go to the project folder:
 > cd ~/ansible-update-os
 # Run playbook:
-> ansible-playbook -i inventory/hosts 00-pre-config-ssh.yml --user=<local_user_name> --ask-pass --become
+> ansible-playbook -i inventory/hosts 00-pre-config-ssh.yml --extra-vars "mgmt_usr=<username>" --user=<local_user_name> --ask-pass --become
 > ansible-playbook -i inventory/hosts 01-main-playbook.yml
 ```
 ### Ключи

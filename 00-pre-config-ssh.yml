@@ -1,6 +1,30 @@
 ---
-- hosts: all
+- hosts: localhost
   connection: paramiko
+
+  pre_tasks:
+    - name: Enable EPEL Repository on CentOS 7
+      yum:
+        name: epel-release
+        state: latest
+      become: True
+      when: (ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7')
+
+    - name: Enable EPEL Repository on CentOS 8
+      dnf:
+        name: epel-release
+        state: latest
+      become: True
+      when: (ansible_os_family == 'RedHat' and ansible_distribution_major_version >= '8')
+
+  tasks:
+    - name: Install sshpass
+      package:
+        name: sshpass
+        state: present
+
+- hosts: all
+  connection: ssh
 
   tasks:
     - name: Ping hosts
@@ -38,6 +62,7 @@
             append: yes
             shell: "/bin/bash"
             state: present
+          changed_when: false
 
         - name: Allows user to execute commands as root
           lineinfile:
@@ -50,14 +75,14 @@
 
         - name: Generate OpenSSH key
           openssh_keypair:
-            path: "{{ inventory_dir }}/{{ mgmt_usr }}"
+            path: "~{{ ansible_user }}/.ssh/{{ mgmt_usr }}"
           register: gen_openssh_key
           delegate_to: 127.0.0.1
           no_log: true
           when: ssh_pub_path is undefined
 
         - set_fact:
-            ssh_pub_key: "{{ lookup('file', '{{ inventory_dir }}/{{ mgmt_usr }}.pub') }}"
+            ssh_pub_key: "{{ lookup('file', '~{{ ansible_user }}/.ssh/{{ mgmt_usr }}.pub') }}"
           when: ssh_pub_path is undefined
           no_log: true
 
@@ -74,13 +99,17 @@
           no_log: true
           when: ssh_pub_key is defined
 
-        - local_action:
-            debug msg="Do not forget to save your account information in a safe place! LOGIN -> {{ mgmt_usr }} & PASSWORD -> {{ rand_pass }}"
+        - name: INFO
+          debug:
+            msg: "Do not forget to save your account information in a safe place! LOGIN -> {{ mgmt_usr }} & PASSWORD -> {{ rand_pass }}"
           run_once: true
+          delegate_to: 127.0.0.1
 
-        - local_action:
-            debug msg="Do not forget to save the authentication keys from the <{{ inventory_dir }}> folder in a safe place! PRIVATE KEY -> {{ mgmt_usr }} & PUBLIC KEY -> {{ mgmt_usr }}.pub"
+        - name: INFO
+          debug:
+            msg: "Do not forget to save the authentication keys from the <{% if ssh_pub_path is undefined %}~{{ ansible_user }}/.ssh/{% else %}{{ ssh_pub_path }}/{% endif %}> folder in a safe place! PRIVATE KEY -> {{ mgmt_usr }} & PUBLIC KEY -> {{ mgmt_usr }}.pub"
           run_once: true
+          delegate_to: 127.0.0.1
           when: ssh_pub_path is undefined and ssh_pub_key is defined
 
         - name: Clean secret on log file
@@ -88,6 +117,48 @@
             path: "{{ playbook_dir }}/logs/ansible-log.log"
             regexp: 'Do not forget to save'
             state: absent
+          changed_when: false
       tags:
         - create_mgmt_usr
-...
+
+- hosts: localhost
+  connection: paramiko
+
+  tasks:
+    - name: Check .bash_profile configure for ssh-agent
+      slurp:
+        src: "{% if ssh_pub_path is undefined %}~{{ ansible_user }}/.bash_profile{% else %}{{ ssh_pub_path | dirname }}/.bash_profile{% endif %}"
+      register: check_bash_profile
+
+    - name: Set condition fact if ssh-agent alredy configure
+      set_fact:
+        exist_ssh_agent: "{{ check_bash_profile['content'] | b64decode | regex_search('exec ssh-agent')}}"
+
+    - name: Add new ssh-key to ssh-agent
+      lineinfile:
+        path: "{% if ssh_pub_path is undefined %}~{{ ansible_user }}/.bash_profile{% else %}{{ ssh_pub_path | dirname }}/.bash_profile{% endif %}"
+        insertbefore: '^(.*)ssh-add ~/.ssh/(.*)$'
+        line: '    ssh-add ~/.ssh/{{ mgmt_usr }} \'
+        state: present
+      when: exist_ssh_agent != ""
+
+    - name: Add ssh-agent in startup
+      blockinfile:
+        path: "{% if ssh_pub_path is undefined %}~{{ ansible_user }}/.bash_profile{% else %}{{ ssh_pub_path | dirname }}/.bash_profile{% endif %}"
+        block: |
+          exec ssh-agent $BASH -s 10<&0 << EOF
+              ssh-add ~/.ssh/auser \
+              &> /dev/null
+              exec $BASH <&10-
+          EOF
+      when: exist_ssh_agent == ""
+
+    - name: Add aliase
+      lineinfile:
+        path: "{% if ssh_pub_path is undefined %}~{{ ansible_user }}/.bashrc{% else %}{{ ssh_pub_path | dirname }}/.bashrc{% endif %}"
+        insertafter: '^alias.*$'
+        line: "alias {{ item }}='{{ item }} -u {{ mgmt_usr }} -b'"
+        state: present
+      loop:
+        - ansible
+        - ansible-playbook
