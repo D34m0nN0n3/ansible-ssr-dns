@@ -32,13 +32,14 @@ mkdocs-encryptcontent-plugin
 mkdocs-exclude
 mkdocs-bootstrap-tables-plugin
 mkdocs-macros-plugin
-mkdocs-material>=5.3.3
+mkdocs-material=="8.*"
 mkdocs-material-extensions>=1.0
 mkdocs-git-revision-date-plugin
 mkdocs-git-revision-date-localized-plugin
 mkdocs-markdownextradata-plugin
 mkdocs-mdpo-plugin
 mkdocs-mermaid2-plugin
+mkdocs-minify-plugin
 mkdocs-newsletter
 mkdocs-rss-plugin
 mkdocs-section-index
