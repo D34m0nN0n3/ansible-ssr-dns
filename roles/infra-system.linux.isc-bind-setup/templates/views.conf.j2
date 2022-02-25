@@ -36,7 +36,7 @@ view "internal" {
                  all-per-second 20; // When we drop all
                  ipv4-prefix-length 24; // Define the IPv4 block size
                  ipv6-prefix-length 56; // Define the IPv6 block size
-                 max-table-size 20000; // 40 bytes * this number = max memory
+                 max-table-size 200000; // 40 bytes * this number = max memory
                  min-table-size 500; // pre-allocate to speed startup
                  log-only yes; // Debugging mode
                  };
@@ -126,11 +126,10 @@ view "external" {
       dnssec-validation yes;
 
       rate-limit {
-                 window 5; // Seconds to bucket
-                 responses-per-second 30;// # of good responses per prefix-length/sec
-                 nodata-per-second 5; // nodata responses
-                 nxdomains-per-second 5; // nxdomain responses
-                 errors-per-second 5; // error responses
+                 responses-per-second 250;// # of good responses per prefix-length/sec
+                 nodata-per-second 25; // nodata responses
+                 nxdomains-per-second 25; // nxdomain responses
+                 errors-per-second 25; // error responses
                  log-only no; // Debugging mode
                  };
 
