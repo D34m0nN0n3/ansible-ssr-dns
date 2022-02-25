@@ -28,11 +28,11 @@ view "internal" {
       rate-limit {
                  slip 2; // Every other response truncated
                  window 15; // Seconds to bucket
-                 responses-per-second 5;// # of good responses per prefix-length/sec
-                 referrals-per-second 5; // referral responses
-                 nodata-per-second 5; // nodata responses
-                 nxdomains-per-second 5; // nxdomain responses
-                 errors-per-second 5; // error responses
+                 responses-per-second 15; // Numbers of good responses per prefix-length/sec
+                 referrals-per-second 5; // "referral" responses
+                 nodata-per-second 5; // "nodata" responses
+                 nxdomains-per-second 5; // "nxdomain" responses
+                 errors-per-second 5; // "error" responses
                  all-per-second 20; // When we drop all
                  ipv4-prefix-length 24; // Define the IPv4 block size
                  ipv6-prefix-length 56; // Define the IPv6 block size
@@ -126,10 +126,10 @@ view "external" {
       dnssec-validation yes;
 
       rate-limit {
-                 responses-per-second 250;// # of good responses per prefix-length/sec
-                 nodata-per-second 25; // nodata responses
-                 nxdomains-per-second 25; // nxdomain responses
-                 errors-per-second 25; // error responses
+                 responses-per-second 250;// Numbers of good responses per prefix-length/sec
+                 nodata-per-second 25; // "nodata" responses
+                 nxdomains-per-second 25; // "nxdomain" responses
+                 errors-per-second 25; // "error" responses
                  log-only no; // Debugging mode
                  };
 
