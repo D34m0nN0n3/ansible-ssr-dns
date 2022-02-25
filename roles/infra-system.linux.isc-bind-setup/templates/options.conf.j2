@@ -39,6 +39,7 @@ alt-transfer-source          {{ ansible_all_ipv4_addresses[1] }} port 53;
 notify-source                * port 53;
 notify                       explicit;
 transfer-format              many-answers;
+minimal-any                  {{ bind_minimal_responses | default('yes') }};
 minimal-responses            {{ bind_minimal_responses | default('yes') }};
 empty-zones-enable           yes;
 flush-zones-on-shutdown      yes;
