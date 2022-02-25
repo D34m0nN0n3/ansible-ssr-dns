@@ -38,7 +38,7 @@ view "internal" {
                  ipv6-prefix-length 56; // Define the IPv6 block size
                  max-table-size 20000; // 40 bytes * this number = max memory
                  min-table-size 500; // pre-allocate to speed startup
-                 log-only no; // Debugging mode
+                 log-only yes; // Debugging mode
                  };
 
       response-policy { zone "rpz.passeddomain.hosts" policy passthru; 
