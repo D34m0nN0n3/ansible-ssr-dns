@@ -127,7 +127,7 @@ view "external" {
 
       rate-limit {
                  window 5; // Seconds to bucket
-                 responses-per-second 1;// # of good responses per prefix-length/sec
+                 responses-per-second 30;// # of good responses per prefix-length/sec
                  nodata-per-second 5; // nodata responses
                  nxdomains-per-second 5; // nxdomain responses
                  errors-per-second 5; // error responses
