@@ -2,10 +2,10 @@
 $TTL   86400 ; 1 day
 @       IN      SOA     {{ ansible_fqdn }}. postmaster.{{ ansible_domain }} (
                           {{ lookup('pipe','date +%Y%m%d') + ('00') }}
-                          28800   ; refresh  8 hours
-                          7200    ; retry    2 hours
-                          864000  ; expire  10 days
-                          86400 ) ; min ttl  1 day
+                          900     ; refresh  15 minutes
+                          600     ; retry    10 minutes
+                          2592000 ; expire   30 days
+                          900 )   ; min ttl  15 minutes
 
 {% for in_ns in list_ns %}	
                           IN  NS     {{ in_ns }}.
