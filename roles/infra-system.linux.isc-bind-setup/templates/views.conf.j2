@@ -1,9 +1,37 @@
 {%- import '_macros.j2' as macros with context -%}
+{% if bind_root_ipv4_static is defined %}
+{% set root_list_ip4 = bind_root_ipv4_static.split(',') %}
+{% endif -%}
 {% set list_slaves = ip_slaves.split(',') %}
 // Change the version that BIND reports when queried for version.bind: https://kb.isc.org/docs/aa-00359
 // How share a dynamic zone between multiple views: https://kb.isc.org/docs/aa-00295
 // Response Policy Zones (RPZ): https://kb.isc.org/docs/aa-00525
 //
+{% if bind_srv_type == "localroot" | string() %}
+// For RECURSIVE (caching) DNS server. RFC7706
+view "local_root" {
+      match-destinations { authorized_networks; };
+      zone "." {
+          type slave;
+          file "rootzone.db";
+          notify no;
+          masters {
+              192.228.79.201; # b.root-servers.net
+              192.33.4.12;    # c.root-servers.net
+              192.5.5.241;    # f.root-servers.net
+              192.112.36.4;   # g.root-servers.net
+              193.0.14.129;   # k.root-servers.net
+              192.0.47.132;   # xfr.cjr.dns.icann.org
+              192.0.32.132;   # xfr.lax.dns.icann.org
+              2001:500:84::b; # b.root-servers.net
+              2001:500:2f::f; # f.root-servers.net
+              2001:7fd::1;    # k.root-servers.net
+              2620:0:2830:202::132;  # xfr.cjr.dns.icann.org
+              2620:0:2d0:202::132;  # xfr.lax.dns.icann.org
+          };
+      };
+};
+{% endif %}
 {% if bind_srv_type == "resolver" | string() or bind_srv_type == "mixed" | string() %}
 view "internal" {
       match-clients { internal; };
@@ -93,11 +121,19 @@ zone "rpz.blockeddomain.hosts" IN {
       allow-transfer { none; };
 {%   endif %}
       };
-        
+
+{%    if bind_localroot_resolv is defined and bind_localroot_resolv is sameas true %}
+// For RECURSIVE (caching) DNS clients. RFC7706
+    zone "." {
+        type static-stub;
+        server-addresses { {% for local_root_ip4 in root_list_ip4 %}{{ local_root_ip4 }}; {% endfor %} };
+    };
+{%    else %}
 zone "." IN {
       type hint;
       file "named.ca";
       };
+{%    endif %}
 
 include                       "/etc/named.rfc1912.zones";
 {%  if bind_srv_type == "mixed" | string() %}
