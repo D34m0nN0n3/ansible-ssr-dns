@@ -18,7 +18,6 @@ memstatistics                yes;
 zone-statistics              yes;
 max-cache-size               {{ bind_max_cache | default('256M') }};
 max-journal-size             {{ bind_max_journal | default('500M') }};
-cleaning-interval            {{ bind_cleanig_interval | default('60') }};
 allow-query                  { authorized_networks; };
 allow-transfer               { none; };
 allow-update                 { none; };
