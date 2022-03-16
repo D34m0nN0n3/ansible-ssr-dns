@@ -51,7 +51,6 @@ Domain name server — приложение, предназначенное дл
 | bind_ip_v6_on          |    boolean     |           undef (false  )            | Поддержка протокола IPv6.                                                                                                    |
 | bind_max_cache         |     string     |                 256M                 | Максимальный размер кеша в Мб.                                                                                               |
 | bind_max_journal       |     string     |                 500M                 | Максимальный размер журнала в Мб.                                                                                            |
-| bind_cleanig_interval  |     string     |                  60                  | Задающая интервал очищения кэша RR записей в минутах.                                                                        |
 | alt_tranfer_src        |    boolean     |            undef (false)             | Задает использования альтернативного интерфейса для передачи зон.                                                            |
 | mf_format              |     string     |                undef                 | Задает формат зон: map, raw, text.                                                                                           |
 | zero_ttl               |    boolean     |                undef                 | При возврате авторитетных отрицательных ответов на запросы SOA установите TTL записи SOA.                                    |
