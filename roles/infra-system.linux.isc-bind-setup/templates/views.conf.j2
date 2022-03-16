@@ -43,8 +43,6 @@ view "internal" {
       allow-transfer { trusted_servers; };
       allow-recursion { internal; };
       recursion yes;
-      additional-from-auth yes;
-      additional-from-cache yes;
 {%  if bind_forwarders is defined %}
       forward first;
       {%   if bind_forwarders | length > 0 %}forwarders { {{ bind_forwarders | join('; ') }}; };{%   endif %}
@@ -151,8 +149,6 @@ view "external" {
       allow-notify { trusted_servers; };
       allow-transfer { trusted_servers; };
       recursion no;
-      additional-from-auth no;
-      additional-from-cache no;
 {%  if alt_tranfer_src is defined and alt_tranfer_src is sameas true %}
       use-alt-transfer-source yes;
 {%  endif %}
