@@ -37,7 +37,6 @@ view "internal" {
       match-clients { internal; };
       allow-query { internal; };
       allow-query-on { internal; };
-      allow-query-cache-on { internal; };
       allow-update { trusted_servers; };
       allow-notify { trusted_servers; };
       allow-transfer { trusted_servers; };
@@ -144,6 +143,7 @@ view "external" {
       match-clients { external; };
       allow-query { external; };
       allow-query-on { external; };
+      allow-query-cache { none; };
       allow-query-cache-on { none; };
       allow-update { trusted_servers; };
       allow-notify { trusted_servers; };
