@@ -43,7 +43,7 @@
 
 - name: Configure extands
   block:
-    - name: Copy internal-include-extanded.conf & external-include-extanded.conf
+    - name: Copy internal-include-extended.conf & external-include-extended.conf
       copy:
         src: "{{ local_git_repo }}/{{ item }}"
         dest: "/etc/named/{{ item }}"
@@ -52,12 +52,12 @@
         mode: "0650"
         setype: named_conf_t
       loop:
-        - internal-include-extanded.conf
-        - external-include-extanded.conf
+        - internal-include-extended.conf
+        - external-include-extended.conf
 
-    - name: Replace type zone master to slave in external-include-extanded.conf
+    - name: Replace type zone master to slave in external-include-extended.conf
       replace:
-        path: "/etc/named/external-include-extanded.conf"
+        path: "/etc/named/external-include-extended.conf"
         regexp: 'type(\s*)master\;'
         replace: 'type slave;\n\t\t masters { {{ ip_master }}; };'
         owner: root
@@ -67,9 +67,9 @@
       when: (bind_srv_role is defined and bind_srv_role == 'slave') or
             ('slaves' in groups and groups['slaves']) and inventory_hostname in groups['slaves']
 
-    - name: Replace dir in external-include-extanded.conf
+    - name: Replace dir in external-include-extended.conf
       replace:
-        path: "/etc/named/external-include-extanded.conf"
+        path: "/etc/named/external-include-extended.conf"
         regexp: '(/var/named/masters/|/var/named/slaves/)'
         replace: '/var/named/slaves/external/'
         owner: root
@@ -83,14 +83,14 @@
       lineinfile:
         path: "/etc/named/views.conf"
         insertbefore: 'include                       "/etc/named/zones-internal.conf";'
-        line: 'include                       "/etc/named/internal-include-extanded.conf";'
+        line: 'include                       "/etc/named/internal-include-extended.conf";'
         state: present
 
     - name: Add include to external view
       lineinfile:
         path: "/etc/named/views.conf"
         insertbefore: 'include                       "/etc/named/zones-external.conf";'
-        line: 'include                       "/etc/named/external-include-extanded.conf";'
+        line: 'include                       "/etc/named/external-include-extended.conf";'
         state: present
 
 - name: Create temp zones config
