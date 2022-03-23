@@ -108,7 +108,7 @@ fi
 [[ ! -f ${FILE}.${DATE}.bak ]] && panic 1 "${FILE}.${DATE}.bak does not exist"
 
 # Run VIM in sudo to open the file.
-vim -c ":set tabstop=8" -c ":set shiftwidth=8" -c ":set noexpandtab" ${FILE}.${DATE}.bak
+vim -c ":set tabstop=8" -c ":set shiftwidth=8" -c ":set noexpandtab" -c ":set paste" ${FILE}.${DATE}.bak
 echo ""
 pad "Editing $FILE"
 if [ $? -ne 0 ]; then
