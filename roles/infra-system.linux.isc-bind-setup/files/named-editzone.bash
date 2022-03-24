@@ -48,7 +48,6 @@ DOMAIN=$1
 FILE=$2
 ZCONV='False'
 DATE=$(date +%Y%m%d)
-SERNUM=$(grep -m 1 -o -hE '[0-9]{9,10}' $FILE)
 SERTMP="${DATE}00"
 SERNEW=''
 BIND=''
@@ -99,13 +98,14 @@ function panic {
 }
 
 # Conver RAW to TEXT or creat backup file ZONE.
-if file ${FILE} | grep -e 'data$'; then
+if file ${FILE} | grep -oe 'data$'; then
 named-compilezone -f raw -F text -o ${FILE}.${DATE}.bak ${DOMAIN} ${FILE} > /dev/null 2>&1 && ZCONV='True'
 else
 cp -p ${FILE} ${FILE}.${DATE}.bak > /dev/null 2>&1
 fi
 
 [[ ! -f ${FILE}.${DATE}.bak ]] && panic 1 "${FILE}.${DATE}.bak does not exist"
+SERNUM=$(grep -m 1 -o -hE '[0-9]{9,10}' ${FILE}.${DATE}.bak)
 
 # Run VIM in sudo to open the file.
 vim -c ":set tabstop=8" -c ":set shiftwidth=8" -c ":set noexpandtab" -c ":set paste" ${FILE}.${DATE}.bak
