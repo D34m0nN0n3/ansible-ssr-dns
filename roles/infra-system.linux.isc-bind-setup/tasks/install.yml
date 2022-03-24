@@ -128,8 +128,10 @@
     serole: object_r
     setype: bin_t
   loop:
+    - 'named-compileallzones'
     - 'named-editzone'
     - 'named-healthy-check'
+    - 'named-mirrormasterzones'
   tags:
     - bind_setupe
 
