@@ -128,6 +128,7 @@
     serole: object_r
     setype: bin_t
   loop:
+    - 'dns-zone-queries'
     - 'named-compileallzones'
     - 'named-editzone'
     - 'named-healthy-check'
