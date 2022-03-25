@@ -6,9 +6,11 @@
 # of the License, but changing it is not allowed.
 #*********************************************************************************************************************
 
-if [[ $EUID -ne 0 ]] || [[ $(id -g -r) -ne 25 ]]; then
-   echo "[-] This script must be run as root or named group users" 1>&2
-   exit 1
+if [[ $EUID -ne 0 ]]; then
+  if [[ $(id -g -r) -ne 25 ]]; then
+     echo "[-] This script must be run as root or named group users" 1>&2
+     exit 255
+  fi
 fi
 
 # Export LANG so we get consistent results
