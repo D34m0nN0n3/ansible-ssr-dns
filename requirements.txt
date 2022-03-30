@@ -32,7 +32,7 @@ mkdocs-encryptcontent-plugin
 mkdocs-exclude
 mkdocs-bootstrap-tables-plugin
 mkdocs-macros-plugin
-mkdocs-material==8.1.6
+mkdocs-material==8.2.8
 mkdocs-material-extensions>=1.0
 mkdocs-git-revision-date-plugin
 mkdocs-git-revision-date-localized-plugin
