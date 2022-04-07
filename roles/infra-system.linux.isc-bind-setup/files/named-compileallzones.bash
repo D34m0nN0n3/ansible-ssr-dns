@@ -53,7 +53,7 @@ mkdir zones_db > /dev/null 2>&1
 for ZFILE in $(ls ${ZDIR})
 do
 ZTYPE=$(file ${ZFILE} | grep -oe 'ASCII text';)
-# Conver RAW to TEXT or creat backup file ZONE.
+# Conver  TEXT to RAW file ZONE.
 if [[ ZTYPE == 'ASCII text' ]]; then
 named-compilezone -f text -F raw -o zones_db/${ZFILE} ${ZFILE} ${ZDIR}/${ZFILE} > /dev/null 2>&1
 fi
