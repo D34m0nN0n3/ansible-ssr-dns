@@ -1,5 +1,5 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![HitCount](http://hits.dwyl.com/D34m0nN0n3/ansible-ssr-dns.svg)](http://hits.dwyl.com/D34m0nN0n3/ansible-ssr-dns)
+[![HitCount](http://hits.dwyl.com/D34m0nN0n3/ansible-ssr-dns.svg?style=flat-square&show=unique)](http://hits.dwyl.com/D34m0nN0n3/ansible-ssr-dns)
 
 # Install and configuration BIND 9
 Copyright (C) 2020 Dmitriy Prigoda deamon.none@gmail.com This script is free software: Everyone is permitted to copy and distribute verbatim copies of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License.
