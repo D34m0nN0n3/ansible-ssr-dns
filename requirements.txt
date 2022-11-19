@@ -49,3 +49,5 @@ mkdocs-thumbnails
 mkdocs-user-defined-values
 mkdocs-vim-md-tags-plugin
 mkdocs-with-pdf
+setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
+wheel>=0.38.0 # not directly required, pinned by Snyk to avoid a vulnerability
