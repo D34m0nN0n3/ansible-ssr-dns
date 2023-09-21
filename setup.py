@@ -8,6 +8,8 @@ with open("requirements.txt") as data:
         if line and not line.startswith("#")
     ]
 
+print(install_requires)
+
 # Package description
 setup(
     install_requires = install_requires,
