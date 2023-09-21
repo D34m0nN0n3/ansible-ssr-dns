@@ -1,5 +1,5 @@
 import json
-from setuptools import setup, find_packages
+from setuptools import setup
 
 # Load list of dependencies
 with open("requirements.txt") as data:
