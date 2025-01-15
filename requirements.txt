@@ -14,7 +14,7 @@ MarkupSafe>=1.1.1
 mike
 mkdocs>=1.2.3
 pdfrw>=0.4
-Pillow>=6.2.2
+Pillow>=10.0.0
 pycparser>=2.18
 pygments>=2.4
 pymdown-extensions>=7.0
