@@ -17,7 +17,7 @@ pdfrw>=0.4
 Pillow>=6.2.2
 pycparser>=2.18
 pygments>=2.4
-pymdown-extensions>=7.0
+pymdown-extensions>=10.16.1
 Pyphen>=0.9.5
 PyYAML>=3.12
 six>=1.11.0
@@ -51,3 +51,4 @@ mkdocs-vim-md-tags-plugin
 mkdocs-with-pdf
 setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
 numpy>=1.22.2 # not directly required, pinned by Snyk to avoid a vulnerability
+fonttools>=4.61.0 # not directly required, pinned by Snyk to avoid a vulnerability
